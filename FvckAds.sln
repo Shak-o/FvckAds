@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{D3A06823-AC1C-4409-9AD6-EE2A5E1900FC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{2663DD90-8011-4773-96C3-1A33D7191A87}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{2E211129-BF6E-4409-BA91-C66BED47909C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{660B91EF-DB42-4AC1-BBEE-C56197CFB6CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FvckAds.AppHost", "src\Shared\FvckAds.AppHost\FvckAds.AppHost.csproj", "{415280CC-7278-4338-A86F-DFF60133E570}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FvckAds.ServiceDefaults", "src\Shared\FvckAds.ServiceDefaults\FvckAds.ServiceDefaults.csproj", "{E8B27945-D2E5-424E-A904-5ECDC80D1DCE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FvckAds.StreamManagerApi", "src\Presentation\FvckAds.StreamManagerApi\FvckAds.StreamManagerApi.csproj", "{1C779405-FA59-4871-946E-753FA711547F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FvckAds.StoreApi", "src\Presentation\FvckAds.StoreApi\FvckAds.StoreApi.csproj", "{7D98F3C9-52B3-4D47-A6C8-43D88FC0FEB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FvckAds.WebClient", "src\Presentation\FvckAds.WebClient\FvckAds.WebClient.csproj", "{C4A35771-344B-4FFA-B19B-4B301F0E0A98}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{415280CC-7278-4338-A86F-DFF60133E570}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{415280CC-7278-4338-A86F-DFF60133E570}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{415280CC-7278-4338-A86F-DFF60133E570}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{415280CC-7278-4338-A86F-DFF60133E570}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8B27945-D2E5-424E-A904-5ECDC80D1DCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8B27945-D2E5-424E-A904-5ECDC80D1DCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8B27945-D2E5-424E-A904-5ECDC80D1DCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8B27945-D2E5-424E-A904-5ECDC80D1DCE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C779405-FA59-4871-946E-753FA711547F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C779405-FA59-4871-946E-753FA711547F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C779405-FA59-4871-946E-753FA711547F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C779405-FA59-4871-946E-753FA711547F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D98F3C9-52B3-4D47-A6C8-43D88FC0FEB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D98F3C9-52B3-4D47-A6C8-43D88FC0FEB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D98F3C9-52B3-4D47-A6C8-43D88FC0FEB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D98F3C9-52B3-4D47-A6C8-43D88FC0FEB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4A35771-344B-4FFA-B19B-4B301F0E0A98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4A35771-344B-4FFA-B19B-4B301F0E0A98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4A35771-344B-4FFA-B19B-4B301F0E0A98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4A35771-344B-4FFA-B19B-4B301F0E0A98}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{415280CC-7278-4338-A86F-DFF60133E570} = {660B91EF-DB42-4AC1-BBEE-C56197CFB6CC}
+		{E8B27945-D2E5-424E-A904-5ECDC80D1DCE} = {660B91EF-DB42-4AC1-BBEE-C56197CFB6CC}
+		{1C779405-FA59-4871-946E-753FA711547F} = {2E211129-BF6E-4409-BA91-C66BED47909C}
+		{7D98F3C9-52B3-4D47-A6C8-43D88FC0FEB9} = {2E211129-BF6E-4409-BA91-C66BED47909C}
+		{C4A35771-344B-4FFA-B19B-4B301F0E0A98} = {2E211129-BF6E-4409-BA91-C66BED47909C}
+	EndGlobalSection
+EndGlobal

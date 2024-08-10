@@ -1,0 +1,6 @@
+@FvckAds.StreamManagerApi_HostAddress = http://localhost:5078
+
+GET {{FvckAds.StreamManagerApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

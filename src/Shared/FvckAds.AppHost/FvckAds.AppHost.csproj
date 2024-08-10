@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsAspireHost>true</IsAspireHost>
+        <UserSecretsId>947E3548-029C-444A-9392-921CB5433C00</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Hosting.AppHost" Version="8.1.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Presentation\FvckAds.StoreApi\FvckAds.StoreApi.csproj" />
+      <ProjectReference Include="..\..\Presentation\FvckAds.StreamManagerApi\FvckAds.StreamManagerApi.csproj" />
+      <ProjectReference Include="..\..\Presentation\FvckAds.WebClient\FvckAds.WebClient.csproj" />
+    </ItemGroup>
+
+</Project>
