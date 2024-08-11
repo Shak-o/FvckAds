@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.1.0" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\Core\FvckAds.Domain\FvckAds.Domain.csproj" />
+      <ProjectReference Include="..\..\Shared\FvckAds.ServiceDefaults\FvckAds.ServiceDefaults.csproj" />
+    </ItemGroup>
+</Project>

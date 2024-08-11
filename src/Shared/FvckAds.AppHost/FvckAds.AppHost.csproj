@@ -11,9 +11,12 @@
 
     <ItemGroup>
         <PackageReference Include="Aspire.Hosting.AppHost" Version="8.1.0"/>
+        <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="8.1.0" />
+        <PackageReference Include="Aspire.Hosting.Redis" Version="8.1.0" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\Infrastructure\FvckAds.MigrationService\FvckAds.MigrationService.csproj" />
       <ProjectReference Include="..\..\Presentation\FvckAds.StoreApi\FvckAds.StoreApi.csproj" />
       <ProjectReference Include="..\..\Presentation\FvckAds.StreamManagerApi\FvckAds.StreamManagerApi.csproj" />
       <ProjectReference Include="..\..\Presentation\FvckAds.WebClient\FvckAds.WebClient.csproj" />
