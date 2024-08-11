@@ -19,6 +19,7 @@
       <ProjectReference Include="..\..\Infrastructure\FvckAds.MigrationService\FvckAds.MigrationService.csproj" />
       <ProjectReference Include="..\..\Presentation\FvckAds.StoreApi\FvckAds.StoreApi.csproj" />
       <ProjectReference Include="..\..\Presentation\FvckAds.StreamManagerApi\FvckAds.StreamManagerApi.csproj" />
+      <ProjectReference Include="..\..\Presentation\FvckAds.UserManagerApi\FvckAds.UserManagerApi.csproj" />
       <ProjectReference Include="..\..\Presentation\FvckAds.WebClient\FvckAds.WebClient.csproj" />
     </ItemGroup>
 

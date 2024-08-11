@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FvckAds.Persistence", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FvckAds.MigrationService", "src\Infrastructure\FvckAds.MigrationService\FvckAds.MigrationService.csproj", "{7EB072FC-2548-4E8C-A794-2834BF47DE4E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FvckAds.UserManagerApi", "src\Presentation\FvckAds.UserManagerApi\FvckAds.UserManagerApi.csproj", "{62196043-84AD-4E7A-9627-BFE557877A51}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,10 @@ Global
 		{7EB072FC-2548-4E8C-A794-2834BF47DE4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7EB072FC-2548-4E8C-A794-2834BF47DE4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7EB072FC-2548-4E8C-A794-2834BF47DE4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62196043-84AD-4E7A-9627-BFE557877A51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62196043-84AD-4E7A-9627-BFE557877A51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62196043-84AD-4E7A-9627-BFE557877A51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62196043-84AD-4E7A-9627-BFE557877A51}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{415280CC-7278-4338-A86F-DFF60133E570} = {660B91EF-DB42-4AC1-BBEE-C56197CFB6CC}
@@ -86,5 +92,6 @@ Global
 		{46BB758D-F265-44E0-9ED2-461A578D84F3} = {D3A06823-AC1C-4409-9AD6-EE2A5E1900FC}
 		{D0D0157F-F5CF-4806-B055-A97BB4C4F7EA} = {2663DD90-8011-4773-96C3-1A33D7191A87}
 		{7EB072FC-2548-4E8C-A794-2834BF47DE4E} = {2663DD90-8011-4773-96C3-1A33D7191A87}
+		{62196043-84AD-4E7A-9627-BFE557877A51} = {2E211129-BF6E-4409-BA91-C66BED47909C}
 	EndGlobalSection
 EndGlobal

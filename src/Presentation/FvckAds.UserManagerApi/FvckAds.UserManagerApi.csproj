@@ -1,15 +1,18 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
+
     <ItemGroup>
-        <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.1.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
     </ItemGroup>
+
     <ItemGroup>
-      <ProjectReference Include="..\..\Core\FvckAds.Application\FvckAds.Application.csproj" />
+      <ProjectReference Include="..\..\Infrastructure\FvckAds.Persistence\FvckAds.Persistence.csproj" />
       <ProjectReference Include="..\..\Shared\FvckAds.ServiceDefaults\FvckAds.ServiceDefaults.csproj" />
     </ItemGroup>
+
 </Project>
