@@ -18,6 +18,7 @@ public static class DependencyInjection
         builder.Services.AddScoped<IGenericRepository<Room>, GenericRepository<Room>>();
         builder.Services.AddScoped<IGenericRepository<RoomUser>, GenericRepository<RoomUser>>();
         builder.Services.AddScoped<IUsersRepository, UserRepository>();
+        builder.Services.AddScoped<IRoomRepository, RoomRepository>();
         
         return builder;
     }

@@ -1,0 +1,84 @@
+﻿@page "/Chat"
+<style>
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: #fff;
+        height: 100%;
+    }
+    .chat {
+        flex-grow: 1;
+        padding: 15px;
+        overflow-y: auto;
+    }
+    .message {
+        margin-bottom: 15px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .user-message .text {
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px;
+        border-radius: 10px;
+        margin-left: auto;
+        max-width: 70%;
+    }
+    .bot-message .text {
+        background-color: #e9ecef;
+        color: #343a40;
+        padding: 10px;
+        border-radius: 10px;
+        margin-right: auto;
+        max-width: 70%;
+    }
+    .username {
+        font-weight: bold;
+        margin-bottom: 5px;
+        display: block;
+    }
+    .chat-input {
+        display: flex;
+        border-top: 1px solid #ccc;
+    }
+    .chat-input input {
+        flex-grow: 1;
+        border: none;
+        padding: 10px;
+        border-radius: 0;
+    }
+    .chat-input button {
+        border: none;
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: #fff;
+    }
+</style>
+
+
+<div class="chat-container">
+    <div class="chat">
+        <div class="message user-message">
+            <div class="text">
+                <span class="username">User:</span>
+                Hi there!
+            </div>
+        </div>
+        <div class="message bot-message">
+            <div class="text">
+                <span class="username">Bot:</span>
+                Hello! How can I assist you today?
+            </div>
+        </div>
+    </div>
+    <div class="chat-input">
+        <input type="text" class="form-control" placeholder="Type a message...">
+        <button class="btn btn-primary">Send</button>
+    </div>
+</div>
+
+@code {
+    
+}

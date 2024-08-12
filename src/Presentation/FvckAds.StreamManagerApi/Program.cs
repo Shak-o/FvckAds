@@ -1,4 +1,5 @@
 using FvckAds.Persistence;
+using FvckAds.StreamManagerApi.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.AddServiceDefaults();
 builder.AddPersistence();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -26,5 +28,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<ChatHub>("/chat");
 
 app.Run();
