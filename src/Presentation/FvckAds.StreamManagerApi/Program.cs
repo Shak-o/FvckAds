@@ -1,3 +1,4 @@
+using FvckAds.Application;
 using FvckAds.Persistence;
 using FvckAds.StreamManagerApi.Hubs;
 
@@ -11,8 +12,20 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.AddServiceDefaults();
 builder.AddPersistence();
+builder.AddApplication();
 builder.Services.AddSignalR();
-
+var clientUrl = builder.Configuration["services:WebClient:http:0"]!;
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        opt =>
+        {
+            opt.WithOrigins(clientUrl)
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        });
+});
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
@@ -26,6 +39,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseCors("AllowSpecificOrigin");
 
 app.MapControllers();
 

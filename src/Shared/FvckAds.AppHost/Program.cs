@@ -15,6 +15,7 @@ var userManager = builder.AddProject<Projects.FvckAds_UserManagerApi>("UserManag
 
 var webClient = builder.AddProject<Projects.FvckAds_WebClient>("WebClient")
     .WithReference(streamManager);
+streamManager.WithReference(webClient);
 
 builder.AddProject<Projects.FvckAds_MigrationService>("MigrationService")
     .WithReference(postgresDb);

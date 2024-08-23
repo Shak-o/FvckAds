@@ -10,11 +10,7 @@ namespace FvckAds.UserManagerApi.Controllers;
 // TODO Auth
 public class UsersController(IMediator mediator) : ControllerBase
 {
-    [HttpPost("User")]
+    [HttpPost]
     public Task CreateUser(CreateUserCommand createUserCommand, CancellationToken cancellationToken)
         => mediator.Send(createUserCommand, cancellationToken);
-
-    [HttpPost("Room")]
-    public Task CreateRoom(CreateRoomCommand createRoomCommand, CancellationToken cancellationToken)
-        => mediator.Send(createRoomCommand, cancellationToken);
 }

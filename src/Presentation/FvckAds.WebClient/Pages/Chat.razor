@@ -1,4 +1,7 @@
 ﻿@page "/Chat"
+@using Microsoft.AspNetCore.SignalR.Client
+@inject ILogger<Chat> _logger;
+
 <style>
     .chat-container {
         display: flex;
@@ -60,25 +63,76 @@
 
 <div class="chat-container">
     <div class="chat">
-        <div class="message user-message">
-            <div class="text">
-                <span class="username">User:</span>
-                Hi there!
-            </div>
-        </div>
-        <div class="message bot-message">
-            <div class="text">
-                <span class="username">Bot:</span>
-                Hello! How can I assist you today?
-            </div>
-        </div>
+        @foreach (var item in _chat)
+        {
+            if (item.isCurrent)
+            {
+                <div class="message user-message">
+                    <div class="text">
+                        <span class="username">@item.name:</span>
+                        @item.text  
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="message bot-message">
+                    <div class="text">
+                        <span class="username">@item.name:</span>
+                        @item.text  
+                    </div>
+                </div>
+            }
+        }
     </div>
     <div class="chat-input">
-        <input type="text" class="form-control" placeholder="Type a message...">
-        <button class="btn btn-primary">Send</button>
+        <input type="text" class="form-control" placeholder="Type a message..."  @bind="_messageInput">
+        <button class="btn btn-primary" @onclick="async () => await Send()">Send</button>
+    </div>
+    <div class="chat-input">
+        <input type="text" class="form-control" placeholder="Type a message..."  @bind="_tag">
+        <button class="btn btn-primary" @onclick="async () => await SetAndInitializeAsync()">Set</button>
     </div>
 </div>
 
 @code {
+    private HubConnection? _hubConnection;
+    private List<(bool isCurrent, string name, string text)> _chat = new ();
+    private string? _messageInput;
+    private string? _tag;
+    private Guid _identifier;
+    protected override async Task OnInitializedAsync()
+    {
+       
+    }
+
+    private async Task SetAndInitializeAsync()
+    {
+        var roomId = "ec03a588-8b92-4dcf-ae51-e6b4c61c1f43";
+        var convert = Guid.Parse(roomId);
+        _identifier = convert;
+        var currentUserTag = _tag;
+        var uri = new Uri("http://localhost:5078/chat?roomId=" + roomId+"&tag="+ currentUserTag);
+        _logger.LogInformation(uri.ToString());
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(uri)
+            .Build();
+        _hubConnection.On<string, string, Guid>("ReceiveMessage", (tag, text, identifier) =>
+        {
+            var isCurrent = tag == currentUserTag;
+            _chat.Add((isCurrent, tag, text));
+            InvokeAsync(StateHasChanged);
+        });
+        
+        await _hubConnection.StartAsync();
+    }
     
+    private async Task Send()
+    {
+        if (_hubConnection is not null)
+        {
+            await _hubConnection.SendAsync("SendMessage", _tag, _messageInput, _identifier);
+        }
+    }
+
 }

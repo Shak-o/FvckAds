@@ -2,5 +2,5 @@
 
 public interface IChatClient
 {
-    Task ReceiveMessage(int userId, string message);
+    Task ReceiveMessage(string tag, string text, Guid identifier);
 }

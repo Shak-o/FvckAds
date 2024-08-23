@@ -15,22 +15,25 @@ public class ChatHub(IMediator mediator) : Hub<IChatClient>
             throw new ApplicationException("Context is null");
         
         var tag = context.Request.Query.First(x => x.Key == "tag").Value.First();
-        if (tag == null)
+        var roomId = context.Request.Query.First(x => x.Key == "roomId").Value.First();
+        if (tag == null || roomId == null)
             throw new ApplicationException("Tag is null");
         
+        var canParse = Guid.TryParse(roomId, out var roomIdParsed);
         var connectionId = Context.ConnectionId;
         await mediator.Send(new AddConnectionToRoomCommand
         {
             Tag = tag,
+            RoomId = roomIdParsed,
             ConnectionId = connectionId
         });
         
         await base.OnConnectedAsync();
     }
 
-    public async Task SendMessage(int roomId, string message)
+    public async Task SendMessage(string tag, string message, Guid identifier)
     {
-        var connectionIds = await mediator.Send(new GetRoomUserConnections() { RoomId = roomId });
-        await Clients.Clients(connectionIds).ReceiveMessage(roomId, message);
+        var connectionIds = await mediator.Send(new GetRoomUserConnections() { RoomId = identifier });
+        await Clients.Clients(connectionIds).ReceiveMessage(tag, message, identifier);
     }
 }
