@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace FvckAds.Persistence.Migrations
 {
-    [DbContext(typeof(UserManagerDbContext))]
+    [DbContext(typeof(ChatDbContext))]
     partial class UserManagerDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

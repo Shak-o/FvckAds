@@ -6,9 +6,9 @@ namespace FvckAds.Persistence.Repositories;
 
 public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 {
-    private readonly UserManagerDbContext _context;
+    private readonly ChatDbContext _context;
 
-    public GenericRepository(UserManagerDbContext context)
+    public GenericRepository(ChatDbContext context)
     {
         _context = context;
     }

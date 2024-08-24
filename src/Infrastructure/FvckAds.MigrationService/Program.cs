@@ -5,14 +5,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var builder = Host.CreateApplicationBuilder(args);
-builder.Services.AddHostedService<ApiDbInitializer<UserManagerDbContext>>();
+builder.Services.AddHostedService<ApiDbInitializer<ChatDbContext>>();
 
 builder.AddServiceDefaults();
 
 builder.Services.AddOpenTelemetry()
-    .WithTracing(tracing => tracing.AddSource(ApiDbInitializer<UserManagerDbContext>.ActivitySourceName));
+    .WithTracing(tracing => tracing.AddSource(ApiDbInitializer<ChatDbContext>.ActivitySourceName));
 
-builder.AddNpgsqlDbContext<UserManagerDbContext>(AspireConstants.PostgresName);
+builder.AddNpgsqlDbContext<ChatDbContext>(AspireConstants.PostgresName);
 
 var app = builder.Build();
 

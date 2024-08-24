@@ -5,9 +5,9 @@ namespace FvckAds.Persistence.Repositories;
 
 public class UserRepository : IUsersRepository
 {
-    private readonly UserManagerDbContext _context;
+    private readonly ChatDbContext _context;
 
-    public UserRepository(UserManagerDbContext context)
+    public UserRepository(ChatDbContext context)
     {
         _context = context;
     }

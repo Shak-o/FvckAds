@@ -12,7 +12,7 @@ public static class DependencyInjection
 {
     public static IHostApplicationBuilder AddPersistence(this IHostApplicationBuilder builder)
     {
-        builder.AddNpgsqlDbContext<UserManagerDbContext>(AspireConstants.PostgresName);
+        builder.AddNpgsqlDbContext<ChatDbContext>(AspireConstants.PostgresName);
         
         builder.Services.AddScoped<IGenericRepository<User>, GenericRepository<User>>();
         builder.Services.AddScoped<IGenericRepository<Room>, GenericRepository<Room>>();

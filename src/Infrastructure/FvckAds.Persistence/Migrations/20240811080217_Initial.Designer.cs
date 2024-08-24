@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace FvckAds.Persistence.Migrations
 {
-    [DbContext(typeof(UserManagerDbContext))]
+    [DbContext(typeof(ChatDbContext))]
     [Migration("20240811080217_Initial")]
     partial class Initial
     {
