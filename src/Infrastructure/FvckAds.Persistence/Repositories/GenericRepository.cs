@@ -1,4 +1,5 @@
-﻿using FvckAds.Application.RepositoryInterfaces;
+﻿using System.Linq.Expressions;
+using FvckAds.Application.RepositoryInterfaces;
 using FvckAds.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -50,5 +51,10 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {
         var transaction = _context.Database.BeginTransaction();
         throw new NotImplementedException();
+    }
+
+    public Task<T> GetAsync(Expression<Func<T, bool>> filter, CancellationToken cancellationToken)
+    {
+        return _context.Set<T>().Where(filter).FirstAsync(cancellationToken: cancellationToken);
     }
 }

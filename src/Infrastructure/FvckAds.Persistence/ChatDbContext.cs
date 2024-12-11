@@ -1,4 +1,5 @@
-﻿using FvckAds.Domain.Rooms;
+﻿using FvckAds.Domain.Auth;
+using FvckAds.Domain.Rooms;
 using FvckAds.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,7 @@ public class ChatDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Room> Rooms { get; set; }
     public DbSet<RoomUser> RoomUsers { get; set; }
+    public DbSet<Key> Keys { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

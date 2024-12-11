@@ -1,19 +1,21 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var redis = builder.AddRedis("Redis");
+var redis = builder.AddRedis("Redis")
+    .WithLifetime(ContainerLifetime.Persistent);
 var postgresPassword = builder.AddParameter("PostgresPassword", true);
-var postgres = builder.AddPostgres("Postgres", password: postgresPassword).WithDataVolume("PostgresVolume2");
+var postgres = builder.AddPostgres("Postgres", password: postgresPassword, port: 9943)
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithDataVolume("PostgresVolume2");
 var postgresDb = postgres.AddDatabase("UserDb");
 
-builder.AddProject<Projects.FvckAds_StoreApi>("StoreApi");
-var streamManager = builder.AddProject<Projects.FvckAds_StreamManagerApi>("StreamManager")
+builder.AddProject<Projects.FvckAds_StoreApi>("StoreApi", "https");
+var streamManager = builder.AddProject<Projects.FvckAds_StreamManagerApi>("StreamManager","https")
     .WithReference(redis)
     .WithReference(postgresDb);
-
-var userManager = builder.AddProject<Projects.FvckAds_UserManagerApi>("UserManager")
+var userManager = builder.AddProject<Projects.FvckAds_UserManagerApi>("UserManager", "https")
     .WithReference(postgresDb);
 
-var webClient = builder.AddProject<Projects.FvckAds_WebClient>("WebClient")
+var webClient = builder.AddProject<Projects.FvckAds_WebClient>("WebClient", "https")
     .WithReference(streamManager);
 streamManager.WithReference(webClient);
 

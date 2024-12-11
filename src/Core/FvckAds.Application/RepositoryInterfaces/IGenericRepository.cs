@@ -1,8 +1,9 @@
-﻿using FvckAds.Domain;
+﻿using System.Linq.Expressions;
+using FvckAds.Domain;
 
 namespace FvckAds.Application.RepositoryInterfaces;
 
-public interface IGenericRepository<in T> where T : BaseEntity
+public interface IGenericRepository<T> where T : BaseEntity
 {
     Task<int> AddEntityAsync(T entity, CancellationToken cancellationToken);
     Task AddEntitiesAsync(T[] entities, CancellationToken cancellationToken);
@@ -10,4 +11,5 @@ public interface IGenericRepository<in T> where T : BaseEntity
     Task RemoveEntityAsync<TE>(int id, CancellationToken cancellationToken) where TE : BaseEntity;
     Task UpdateEntityAsync(T entity, CancellationToken cancellationToken);
     Task UpdateEntityAsync<TE>(int id, CancellationToken cancellationToken) where TE : BaseEntity;
+    Task<T> GetAsync(Expression<Func<T, bool>> filter, CancellationToken cancellationToken);
 }

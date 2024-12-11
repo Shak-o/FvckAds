@@ -1,5 +1,8 @@
+using System.Text;
 using FvckAds.Application;
 using FvckAds.Persistence;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +14,20 @@ builder.Services.AddSwaggerGen();
 builder.AddServiceDefaults();
 builder.AddPersistence();
 builder.AddApplication();
-
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAlgorithms = [SecurityAlgorithms.Sha512],
+            //IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        };
+    });
 var app = builder.Build();
 app.MapDefaultEndpoints();
 

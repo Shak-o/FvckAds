@@ -3,6 +3,7 @@ using System;
 using FvckAds.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FvckAds.Persistence.Migrations
 {
     [DbContext(typeof(ChatDbContext))]
-    partial class UserManagerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241209204748_AddKeys")]
+    partial class AddKeys
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,9 +32,6 @@ namespace FvckAds.Persistence.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<byte[]>("PrivateKey")
                         .IsRequired()
