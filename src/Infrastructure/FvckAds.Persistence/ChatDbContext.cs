@@ -16,6 +16,7 @@ public class ChatDbContext : DbContext
     public DbSet<Room> Rooms { get; set; }
     public DbSet<RoomUser> RoomUsers { get; set; }
     public DbSet<Key> Keys { get; set; }
+    public DbSet<AuthKey> AuthKeys { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -57,4 +57,14 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {
         return _context.Set<T>().Where(filter).FirstAsync(cancellationToken: cancellationToken);
     }
+    
+    public T GetFirst()
+    {
+        return _context.Set<T>().First();
+    }
+    
+    public Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> filter, CancellationToken cancellationToken)
+    {
+        return _context.Set<T>().FirstOrDefaultAsync(filter, cancellationToken);
+    }
 }

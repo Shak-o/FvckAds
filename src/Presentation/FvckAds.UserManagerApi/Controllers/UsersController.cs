@@ -11,16 +11,10 @@ namespace FvckAds.UserManagerApi.Controllers;
 [Route("[controller]")]
 public class UsersController(IMediator mediator) : ControllerBase
 {
-    // No auth, require specific custom token. 
     [HttpPost]
     [Authorize]
     public Task CreateUser(CreateUserCommand createUserCommand, CancellationToken cancellationToken)
         => mediator.Send(createUserCommand, cancellationToken);
 
-    [HttpPost("login")]
-    [AllowAnonymous]
-    public async Task<string> GetTokenAsync()
-    {
-        return await mediator.Send(new CreateTokenCommand());
-    }
+   
 }

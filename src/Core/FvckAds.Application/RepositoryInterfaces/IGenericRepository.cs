@@ -12,4 +12,6 @@ public interface IGenericRepository<T> where T : BaseEntity
     Task UpdateEntityAsync(T entity, CancellationToken cancellationToken);
     Task UpdateEntityAsync<TE>(int id, CancellationToken cancellationToken) where TE : BaseEntity;
     Task<T> GetAsync(Expression<Func<T, bool>> filter, CancellationToken cancellationToken);
+    T GetFirst();
+    Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> filter, CancellationToken cancellationToken);
 }
