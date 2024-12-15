@@ -18,7 +18,8 @@ public class CreateKeyCommandHandler(IOptions<JwtOptions> jwtOptions, IGenericRe
         {
             CreateDate = DateTime.UtcNow,
             Key = key,
-            LastAccessDate = default
+            LastAccessDate = default,
+            UserId = request.UserId
         }, cancellationToken);
         
         return key;

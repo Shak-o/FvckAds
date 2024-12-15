@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using FvckAds.Application.Authentications.Options;
 using FvckAds.Application.Exceptions;
@@ -47,7 +48,12 @@ public class CreateTokenCommandHandler(
         {
             Issuer = options.Value.Issuer,
             Expires = DateTime.UtcNow.AddHours(1),
-            SigningCredentials = signingCredentials
+            SigningCredentials = signingCredentials,
+            Subject = new ClaimsIdentity(new List<Claim>()
+            {
+                new (ClaimTypes.Name, userTag)
+            }),
+            Audience = "WebClient"
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);

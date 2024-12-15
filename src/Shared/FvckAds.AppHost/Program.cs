@@ -9,13 +9,13 @@ var postgres = builder.AddPostgres("Postgres", password: postgresPassword, port:
 var postgresDb = postgres.AddDatabase("UserDb");
 
 builder.AddProject<Projects.FvckAds_StoreApi>("StoreApi", "https");
-var streamManager = builder.AddProject<Projects.FvckAds_StreamManagerApi>("StreamManager","https")
+var streamManager = builder.AddProject<Projects.FvckAds_StreamManagerApi>("StreamManager","http")
     .WithReference(redis)
     .WithReference(postgresDb);
 var userManager = builder.AddProject<Projects.FvckAds_UserManagerApi>("UserManager", "https")
     .WithReference(postgresDb);
 
-var webClient = builder.AddProject<Projects.FvckAds_WebClient>("WebClient", "https")
+var webClient = builder.AddProject<Projects.FvckAds_SimpleWeb>("WebClient", "http")
     .WithReference(streamManager);
 streamManager.WithReference(webClient);
 

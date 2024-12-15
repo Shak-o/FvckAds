@@ -12,7 +12,6 @@ namespace FvckAds.UserManagerApi.Controllers;
 public class UsersController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
-    [Authorize]
     public Task CreateUser(CreateUserCommand createUserCommand, CancellationToken cancellationToken)
         => mediator.Send(createUserCommand, cancellationToken);
 

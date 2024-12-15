@@ -2,10 +2,13 @@
 using FvckAds.Application.Rooms.Queries;
 using FvckAds.StreamManagerApi.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace FvckAds.StreamManagerApi.Hubs;
 
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class ChatHub(IMediator mediator) : Hub<IChatClient>
 {
     public override async Task OnConnectedAsync()

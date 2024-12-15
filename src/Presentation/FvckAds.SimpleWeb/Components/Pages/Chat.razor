@@ -1,6 +1,7 @@
-﻿@page "/Chat"
+@page "/Chat"
 @using Microsoft.AspNetCore.SignalR.Client
 @inject ILogger<Chat> _logger;
+@rendermode InteractiveServer
 
 <style>
     .chat-container {
@@ -70,7 +71,7 @@
                 <div class="message user-message">
                     <div class="text">
                         <span class="username">@item.name:</span>
-                        @item.text  
+                        @item.text
                     </div>
                 </div>
             }
@@ -79,7 +80,7 @@
                 <div class="message bot-message">
                     <div class="text">
                         <span class="username">@item.name:</span>
-                        @item.text  
+                        @item.text
                     </div>
                 </div>
             }
@@ -92,7 +93,7 @@
     <div class="chat-input">
         <input type="text" class="form-control" placeholder="Username"  @bind="_tag">
         <input type="text" class="form-control" placeholder="Token"  @bind="_jwt">
-        <button class="btn btn-primary" @onclick="async () => await SetAndInitializeAsync()">Set</button>
+        <button class="btn btn-primary" @onclick="SetAndInitializeAsync">Set</button>
     </div>
 </div>
 
@@ -105,7 +106,7 @@
     private Guid _identifier;
     protected override async Task OnInitializedAsync()
     {
-       
+
     }
 
     private async Task SetAndInitializeAsync()
@@ -114,7 +115,7 @@
         var convert = Guid.Parse(roomId);
         _identifier = convert;
         var currentUserTag = _tag;
-        var uri = new Uri("https://localhost:7225/chat?roomId=" + roomId+"&tag="+ currentUserTag + "&access_token="+_jwt);
+        var uri = new Uri("http://localhost:5078/chat?roomId=" + roomId+"&tag="+ currentUserTag + "&access_token="+_jwt);
         _logger.LogInformation(uri.ToString());
         _hubConnection = new HubConnectionBuilder()
             .WithUrl(uri)
@@ -125,10 +126,10 @@
             _chat.Add((isCurrent, tag, text));
             InvokeAsync(StateHasChanged);
         });
-        
+
         await _hubConnection.StartAsync();
     }
-    
+
     private async Task Send()
     {
         if (_hubConnection is not null)

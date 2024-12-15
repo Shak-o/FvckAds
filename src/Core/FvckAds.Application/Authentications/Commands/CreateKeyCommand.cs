@@ -6,4 +6,5 @@ public class CreateKeyCommand : IRequest<Guid>
 {
     public required string Client { get; set; }
     public required string Secret { get; set; }
+    public int UserId { get; set; }
 }
