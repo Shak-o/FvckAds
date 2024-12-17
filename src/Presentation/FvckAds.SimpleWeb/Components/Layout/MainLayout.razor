@@ -1,23 +1,27 @@
 ﻿@inherits LayoutComponentBase
+<div id="app">
+    <!-- Header -->
+    <header class="app-header">
+        <button class="btn btn-link d-md-none sidebar-toggle">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <h1 class="h5 mb-0">Chat App</h1>
+    </header>
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu/>
+    <!-- Main Content Area -->
+    <div class="app-content">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="placeholder-content">
+                Sidebar content will go here
+            </div>
+        </aside>
+
+        @Body
     </div>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
-
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
+    <!-- Footer -->
+    <footer class="app-footer">
+        <span>© 2024 Chat App</span>
+    </footer>
 </div>

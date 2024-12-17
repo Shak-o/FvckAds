@@ -1,141 +1,172 @@
 @page "/Chat"
-@using Microsoft.AspNetCore.SignalR.Client
+@using Blazored.LocalStorage
 @inject ILogger<Chat> _logger;
 @rendermode InteractiveServer
 
-<style>
-    .chat-container {
-        display: flex;
-        flex-direction: column;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        background-color: #fff;
-        height: 100%;
-    }
-    .chat {
-        flex-grow: 1;
-        padding: 15px;
-        overflow-y: auto;
-    }
-    .message {
-        margin-bottom: 15px;
-        display: flex;
-        flex-wrap: wrap;
-    }
-    .user-message .text {
-        background-color: #007bff;
-        color: #fff;
-        padding: 10px;
-        border-radius: 10px;
-        margin-left: auto;
-        max-width: 70%;
-    }
-    .bot-message .text {
-        background-color: #e9ecef;
-        color: #343a40;
-        padding: 10px;
-        border-radius: 10px;
-        margin-right: auto;
-        max-width: 70%;
-    }
-    .username {
-        font-weight: bold;
-        margin-bottom: 5px;
-        display: block;
-    }
-    .chat-input {
-        display: flex;
-        border-top: 1px solid #ccc;
-    }
-    .chat-input input {
-        flex-grow: 1;
-        border: none;
-        padding: 10px;
-        border-radius: 0;
-    }
-    .chat-input button {
-        border: none;
-        padding: 10px 15px;
-        background-color: #007bff;
-        color: #fff;
-    }
-</style>
-
-
-<div class="chat-container">
-    <div class="chat">
-        @foreach (var item in _chat)
-        {
-            if (item.isCurrent)
-            {
-                <div class="message user-message">
-                    <div class="text">
-                        <span class="username">@item.name:</span>
-                        @item.text
+<main class="main-chat-area">
+    <div class="placeholder-content">
+        <div class="chat-container">
+            <div class="chat-messages">
+                <!-- Incoming message example -->
+                <div class="message incoming">
+                    <div class="message-avatar">J</div>
+                    <div>
+                        <div class="message-content">
+                            Hey! How are you doing?
+                        </div>
+                        <div class="message-time">10:30 AM</div>
                     </div>
                 </div>
-            }
-            else
-            {
-                <div class="message bot-message">
-                    <div class="text">
-                        <span class="username">@item.name:</span>
-                        @item.text
+
+                <!-- Outgoing message example -->
+                <div class="message outgoing">
+                    <div>
+                        <div class="message-content">
+                            I'm doing great, thanks for asking! How about you?
+                        </div>
+                        <div class="message-time">10:31 AM</div>
                     </div>
                 </div>
-            }
-        }
+            </div>
+
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+            <textarea class="chat-input"
+                      placeholder="Type a message..."
+                      rows="1"></textarea>
+                    <button class="send-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="chat-input">
-        <input type="text" class="form-control" placeholder="Type a message..."  @bind="_messageInput">
-        <button class="btn btn-primary" @onclick="async () => await Send()">Send</button>
+</main>
+
+@if (IsVisible)
+{
+    <div class="api-modal-overlay">
+        <div class="api-modal">
+            <h2 class="api-modal-title">Enter API Key</h2>
+            <p class="api-modal-description">Please enter your API key to access the chat</p>
+            
+            <div class="api-input-group">
+                <input type="password" 
+                       class="api-key-input" 
+                       placeholder="Enter your API key"
+                       @bind="ApiKey"
+                       @bind:event="oninput"
+                       @onkeypress="HandleKeyPress" />
+                @if (!string.IsNullOrEmpty(ErrorMessage))
+                {
+                    <small class="api-key-error">@ErrorMessage</small>
+                }
+                <small class="api-key-hint">Your API key will be securely stored</small>
+            </div>
+
+            <button class="api-submit-btn" @onclick="HandleSubmit">
+                Continue to Chat
+            </button>
+        </div>
     </div>
-    <div class="chat-input">
-        <input type="text" class="form-control" placeholder="Username"  @bind="_tag">
-        <input type="text" class="form-control" placeholder="Token"  @bind="_jwt">
-        <button class="btn btn-primary" @onclick="SetAndInitializeAsync">Set</button>
-    </div>
-</div>
+}
 
 @code {
-    private HubConnection? _hubConnection;
-    private List<(bool isCurrent, string name, string text)> _chat = new ();
-    private string? _messageInput;
-    private string? _tag;
-    private string? _jwt;
-    private Guid _identifier;
-    protected override async Task OnInitializedAsync()
-    {
+    [Parameter]
+    public EventCallback<string> OnApiKeySubmitted { get; set; }
 
-    }
+    private bool IsVisible { get; set; } = true;
+    private string ApiKey { get; set; } = string.Empty;
+    private string ErrorMessage { get; set; } = string.Empty;
+    private bool _isFirstRender = true;
 
-    private async Task SetAndInitializeAsync()
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
+    [Inject]
+    private ILocalStorageService LocalStorage { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var roomId = "0f984faf-960f-4275-8a69-a23cefaf3c0c";
-        var convert = Guid.Parse(roomId);
-        _identifier = convert;
-        var currentUserTag = _tag;
-        var uri = new Uri("http://localhost:5078/chat?roomId=" + roomId+"&tag="+ currentUserTag + "&access_token="+_jwt);
-        _logger.LogInformation(uri.ToString());
-        _hubConnection = new HubConnectionBuilder()
-            .WithUrl(uri)
-            .Build();
-        _hubConnection.On<string, string, Guid>("ReceiveMessage", (tag, text, identifier) =>
+        if (_isFirstRender)
         {
-            var isCurrent = tag == currentUserTag;
-            _chat.Add((isCurrent, tag, text));
-            InvokeAsync(StateHasChanged);
-        });
-
-        await _hubConnection.StartAsync();
-    }
-
-    private async Task Send()
-    {
-        if (_hubConnection is not null)
-        {
-            await _hubConnection.SendAsync("SendMessage", _tag, _messageInput, _identifier);
+            _isFirstRender = false;
+            // Check if API key exists in local storage
+            var storedApiKey = await LocalStorage.GetItemAsync<string>("chatApiKey");
+            if (!string.IsNullOrEmpty(storedApiKey))
+            {
+                await ValidateAndProceed(storedApiKey);
+                StateHasChanged();
+            }
         }
     }
+
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            //await HandleSubmit();
+        }
+    }
+
+    private void HandleSubmit()
+    {
+        if (string.IsNullOrWhiteSpace(ApiKey))
+        {
+            ErrorMessage = "API key is required";
+            return;
+        }
+
+        //await ValidateAndProceed(ApiKey);
+    }
+
+    private async Task ValidateAndProceed(string apiKey)
+    {
+        try
+        {
+            // Here you would typically validate the API key with your backend
+            // For now, we'll just store it and proceed
+            await LocalStorage.SetItemAsync("chatApiKey", apiKey);
+            IsVisible = false;
+            await OnApiKeySubmitted.InvokeAsync(apiKey);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Failed to validate API key";
+            Console.Error.WriteLine($"API key validation error: {ex.Message}");
+        }
+    }
+    // private async Task SetAndInitializeAsync()
+    // {
+    //     var roomId = "0f984faf-960f-4275-8a69-a23cefaf3c0c";
+    //     var convert = Guid.Parse(roomId);
+    //     _identifier = convert;
+    //     var currentUserTag = _tag;
+    //     var uri = new Uri("http://localhost:5078/chat?roomId=" + roomId + "&tag=" + currentUserTag + "&access_token=");
+    //     _logger.LogInformation(uri.ToString());
+    //     _hubConnection = new HubConnectionBuilder()
+    //         .WithUrl(uri)
+    //         .Build();
+    //     _hubConnection.On<string, string, Guid>("ReceiveMessage", (tag, text, identifier) =>
+    //     {
+    //         var isCurrent = tag == currentUserTag;
+    //         _chat.Add((isCurrent, tag, text));
+    //         InvokeAsync(StateHasChanged);
+    //     });
+    //
+    //     await _hubConnection.StartAsync();
+    // }
+    //
+    // private async Task Send()
+    // {
+    //     if (_hubConnection is not null)
+    //     {
+    //         await _hubConnection.SendAsync("SendMessage", _tag, _messageInput, _identifier);
+    //     }
+    // }
 
 }
