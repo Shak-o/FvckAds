@@ -1,5 +1,5 @@
 using FvckAds.Application;
-using FvckAds.Application.Authentications.Options;
+using FvckAds.Application.UserManager.Authentications.Options;
 using FvckAds.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;

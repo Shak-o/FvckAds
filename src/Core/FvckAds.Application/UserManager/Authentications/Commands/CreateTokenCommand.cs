@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace FvckAds.Application.Authentications.Commands;
+namespace FvckAds.Application.UserManager.Authentications.Commands;
 
 public class CreateTokenCommand : IRequest<string>
 {

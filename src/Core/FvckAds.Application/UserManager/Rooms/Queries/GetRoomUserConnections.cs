@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace FvckAds.Application.Rooms.Queries;
+namespace FvckAds.Application.UserManager.Rooms.Queries;
 
 public class GetRoomUserConnections : IRequest<string[]>
 {

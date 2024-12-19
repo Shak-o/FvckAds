@@ -7,8 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Authentications\Helpers\" />
-      <Folder Include="Users\Queries\" />
+      <Folder Include="UserManager\" />
     </ItemGroup>
 
     <ItemGroup>

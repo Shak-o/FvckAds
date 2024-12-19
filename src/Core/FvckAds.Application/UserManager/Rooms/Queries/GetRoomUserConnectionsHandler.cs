@@ -1,7 +1,7 @@
 ﻿using FvckAds.Application.RepositoryInterfaces;
 using MediatR;
 
-namespace FvckAds.Application.Rooms.Queries;
+namespace FvckAds.Application.UserManager.Rooms.Queries;
 
 public class GetRoomUserConnectionsHandler(IRoomRepository roomRepository) : IRequestHandler<GetRoomUserConnections, string[]>
 {

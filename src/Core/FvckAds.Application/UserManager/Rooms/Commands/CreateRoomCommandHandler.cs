@@ -2,7 +2,7 @@
 using FvckAds.Domain.Rooms;
 using MediatR;
 
-namespace FvckAds.Application.Rooms.Commands;
+namespace FvckAds.Application.UserManager.Rooms.Commands;
 
 public class CreateRoomCommandHandler(IUsersRepository usersRepository, IGenericRepository<Room> roomRepository, IGenericRepository<RoomUser> roomUserRepository) : IRequestHandler<CreateRoomCommand, Guid>
 {

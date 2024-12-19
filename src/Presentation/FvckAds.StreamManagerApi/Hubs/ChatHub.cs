@@ -1,5 +1,5 @@
-﻿using FvckAds.Application.Rooms.Commands;
-using FvckAds.Application.Rooms.Queries;
+﻿using FvckAds.Application.UserManager.Rooms.Commands;
+using FvckAds.Application.UserManager.Rooms.Queries;
 using FvckAds.StreamManagerApi.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

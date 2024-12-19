@@ -1,4 +1,4 @@
-﻿using FvckAds.Application.Rooms.Commands;
+﻿using FvckAds.Application.UserManager.Rooms.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

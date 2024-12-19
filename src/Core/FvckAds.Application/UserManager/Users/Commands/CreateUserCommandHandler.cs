@@ -2,7 +2,7 @@
 using FvckAds.Domain.Users;
 using MediatR;
 
-namespace FvckAds.Application.Users.Commands;
+namespace FvckAds.Application.UserManager.Users.Commands;
 
 public class CreateUserCommandHandler(IGenericRepository<User> userRepo) : IRequestHandler<CreateUserCommand, int>
 {

@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace FvckAds.Application.Rooms.Commands;
+namespace FvckAds.Application.UserManager.Rooms.Commands;
 
 public class CreateRoomCommand : IRequest<Guid>
 {

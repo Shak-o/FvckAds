@@ -8,4 +8,5 @@ public class AuthKey : BaseEntity
     public int UserId { get; set; }
     public User? User { get; set; }
     public DateTime LastAccessDate { get; set; }
+    public bool AlreadyUsed { get; set; }
 }

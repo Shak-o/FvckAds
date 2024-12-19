@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace FvckAds.Application.Users.Commands;
+namespace FvckAds.Application.UserManager.Users.Commands;
 
 public class CreateUserCommand : IRequest<int>
 {

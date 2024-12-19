@@ -3,6 +3,7 @@ using System;
 using FvckAds.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FvckAds.Persistence.Migrations
 {
     [DbContext(typeof(ChatDbContext))]
-    partial class UserManagerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241219184057_AuthKeysAlredyUsed")]
+    partial class AuthKeysAlredyUsed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

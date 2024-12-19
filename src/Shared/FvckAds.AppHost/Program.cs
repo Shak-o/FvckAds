@@ -12,11 +12,12 @@ builder.AddProject<Projects.FvckAds_StoreApi>("StoreApi", "https");
 var streamManager = builder.AddProject<Projects.FvckAds_StreamManagerApi>("StreamManager","http")
     .WithReference(redis)
     .WithReference(postgresDb);
-var userManager = builder.AddProject<Projects.FvckAds_UserManagerApi>("UserManager", "https")
+var userManager = builder.AddProject<Projects.FvckAds_UserManagerApi>("UserManager", "http")
     .WithReference(postgresDb);
 
 var webClient = builder.AddProject<Projects.FvckAds_SimpleWeb>("WebClient", "http")
-    .WithReference(streamManager);
+    .WithReference(streamManager)
+    .WithReference(userManager);
 streamManager.WithReference(webClient);
 
 builder.AddProject<Projects.FvckAds_MigrationService>("MigrationService")

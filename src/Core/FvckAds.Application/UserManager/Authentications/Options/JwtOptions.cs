@@ -1,4 +1,4 @@
-namespace FvckAds.Application.Authentications.Options;
+namespace FvckAds.Application.UserManager.Authentications.Options;
 
 public class JwtOptions
 {

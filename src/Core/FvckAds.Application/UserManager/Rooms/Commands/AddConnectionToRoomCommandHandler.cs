@@ -1,7 +1,7 @@
 ﻿using FvckAds.Application.RepositoryInterfaces;
 using MediatR;
 
-namespace FvckAds.Application.Rooms.Commands;
+namespace FvckAds.Application.UserManager.Rooms.Commands;
 
 public class AddConnectionToRoomCommandHandler(IRoomRepository roomRepository) : IRequestHandler<AddConnectionToRoomCommand>
 {

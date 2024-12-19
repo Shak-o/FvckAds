@@ -1,15 +1,15 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using FvckAds.Application.Authentications.Options;
 using FvckAds.Application.Exceptions;
 using FvckAds.Application.RepositoryInterfaces;
+using FvckAds.Application.UserManager.Authentications.Options;
 using FvckAds.Domain.Auth;
 using MediatR;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace FvckAds.Application.Authentications.Commands.Handlers;
+namespace FvckAds.Application.UserManager.Authentications.Commands.Handlers;
 
 public class CreateTokenCommandHandler(
     IGenericRepository<Key> keyRepo,
@@ -25,12 +25,16 @@ public class CreateTokenCommandHandler(
             throw new AuthException("Invalid API Key");
         }
         
-        key.LastAccessDate = DateTime.UtcNow;
-        await unitOfWork.SaveAsync(cancellationToken);
         if (key.User == null)
             throw new AuthException("Key not assigned");
         
-        return await GenerateKey(key.User.Tag, cancellationToken);
+        var token = await GenerateKey(key.User.Tag, cancellationToken);
+        
+        key.LastAccessDate = DateTime.UtcNow;
+        key.AlreadyUsed = true;
+        await unitOfWork.SaveAsync(cancellationToken);
+        
+        return token;
     }
 
     private async Task<string> GenerateKey(string userTag, CancellationToken cancellationToken)

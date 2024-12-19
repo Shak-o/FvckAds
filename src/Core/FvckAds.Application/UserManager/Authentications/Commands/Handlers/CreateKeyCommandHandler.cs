@@ -1,11 +1,11 @@
-using FvckAds.Application.Authentications.Options;
 using FvckAds.Application.Exceptions;
 using FvckAds.Application.RepositoryInterfaces;
+using FvckAds.Application.UserManager.Authentications.Options;
 using FvckAds.Domain.Auth;
 using MediatR;
 using Microsoft.Extensions.Options;
 
-namespace FvckAds.Application.Authentications.Commands.Handlers;
+namespace FvckAds.Application.UserManager.Authentications.Commands.Handlers;
 
 public class CreateKeyCommandHandler(IOptions<JwtOptions> jwtOptions, IGenericRepository<AuthKey> authKeyRepo) : IRequestHandler<CreateKeyCommand, Guid>
 {

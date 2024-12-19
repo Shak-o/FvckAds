@@ -1,40 +1,50 @@
 @page "/Chat"
+@using System.IdentityModel.Tokens.Jwt
 @using Blazored.LocalStorage
-@inject ILogger<Chat> _logger;
+@using FvckAds.Client.Application.WebClient.Authentications.Commands
+@using FvckAds.SimpleWeb.Components.Models
+@using MediatR
+@using Microsoft.AspNetCore.SignalR.Client
 @rendermode InteractiveServer
-
 <main class="main-chat-area">
     <div class="placeholder-content">
         <div class="chat-container">
             <div class="chat-messages">
-                <!-- Incoming message example -->
-                <div class="message incoming">
-                    <div class="message-avatar">J</div>
-                    <div>
-                        <div class="message-content">
-                            Hey! How are you doing?
+                @foreach (var message in _messages)
+                {
+                    if (message.IsCurrent)
+                    {
+                        <div class="message outgoing">
+                            <div>
+                                <div class="message-content">
+                                    @message.Text
+                                </div>
+                                <div class="message-time">@message.Tag</div>
+                            </div>
                         </div>
-                        <div class="message-time">10:30 AM</div>
-                    </div>
-                </div>
+                    }
+                    else
+                    {
+                        <div class="message incoming">
+                            <div class="message-avatar">J</div>
+                            <div>
+                                <div class="message-content">
+                                    @message.Text
+                                </div>
+                                <div class="message-time">@message.Tag</div>
+                            </div>
+                        </div>
 
-                <!-- Outgoing message example -->
-                <div class="message outgoing">
-                    <div>
-                        <div class="message-content">
-                            I'm doing great, thanks for asking! How about you?
-                        </div>
-                        <div class="message-time">10:31 AM</div>
-                    </div>
-                </div>
+                    }
+                }
             </div>
 
             <div class="chat-input-container">
                 <div class="chat-input-wrapper">
             <textarea class="chat-input"
                       placeholder="Type a message..."
-                      rows="1"></textarea>
-                    <button class="send-button">
+                      rows="1" @bind="TextToSend"></textarea>
+                    <button class="send-button" @onclick="Send">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -53,14 +63,14 @@
         <div class="api-modal">
             <h2 class="api-modal-title">Enter API Key</h2>
             <p class="api-modal-description">Please enter your API key to access the chat</p>
-            
+
             <div class="api-input-group">
-                <input type="password" 
-                       class="api-key-input" 
+                <input type="password"
+                       class="api-key-input"
                        placeholder="Enter your API key"
                        @bind="ApiKey"
                        @bind:event="oninput"
-                       @onkeypress="HandleKeyPress" />
+                       @onkeypress="HandleKeyPress"/>
                 @if (!string.IsNullOrEmpty(ErrorMessage))
                 {
                     <small class="api-key-error">@ErrorMessage</small>
@@ -76,32 +86,53 @@
 }
 
 @code {
-    [Parameter]
-    public EventCallback<string> OnApiKeySubmitted { get; set; }
-
-    private bool IsVisible { get; set; } = true;
+    private bool IsVisible { get; set; } = false;
     private string ApiKey { get; set; } = string.Empty;
     private string ErrorMessage { get; set; } = string.Empty;
-    private bool _isFirstRender = true;
+    private const string JwtLocalKey = "chatApiKey";
+    private string TextToSend { get; set; } = string.Empty;
+    private string CurrentUserTag { get; set; } = string.Empty;
+    private string CurrentRoomId { get; set; } = string.Empty;
+    
+    [Inject] private NavigationManager NavigationManager { get; set; }
 
-    [Inject]
-    private NavigationManager NavigationManager { get; set; }
+    [Inject] private ILocalStorageService LocalStorage { get; set; }
 
-    [Inject]
-    private ILocalStorageService LocalStorage { get; set; }
+    [Inject] private IMediator Mediator { get; set; }
 
+    [Inject] private ILogger<Chat> Logger { get; set; }
+
+    private HubConnection? _hubConnection;
+    private List<MessageModel> _messages = new();
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (_isFirstRender)
+        // Check if API key exists in local storage
+        var storedToken = await LocalStorage.GetItemAsync<string>(JwtLocalKey);
+        if (string.IsNullOrEmpty(storedToken))
         {
-            _isFirstRender = false;
-            // Check if API key exists in local storage
-            var storedApiKey = await LocalStorage.GetItemAsync<string>("chatApiKey");
-            if (!string.IsNullOrEmpty(storedApiKey))
+            IsVisible = true;
+            StateHasChanged();
+        }
+        else
+        {
+            CurrentRoomId = "0f984faf-960f-4275-8a69-a23cefaf3c0c";
+            var jwtHandler = new JwtSecurityTokenHandler();
+            var token = jwtHandler.ReadJwtToken(storedToken);
+            
+            CurrentUserTag = token.Claims.First(x => x.Type == "unique_name").Value;
+            var uri = new Uri("http://localhost:5078/chat?roomId=" + CurrentRoomId + "&tag=" + CurrentUserTag + "&access_token=" + storedToken);
+            Logger.LogInformation(uri.ToString());
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl(uri)
+                .Build();
+            _hubConnection.On<string, string, Guid>("ReceiveMessage", (tag, text, identifier) =>
             {
-                await ValidateAndProceed(storedApiKey);
-                StateHasChanged();
-            }
+                var isCurrent = tag == CurrentUserTag;
+                _messages.Add(new (isCurrent, tag, text));
+                InvokeAsync(StateHasChanged);
+            });
+            
+            await _hubConnection.StartAsync();
         }
     }
 
@@ -113,7 +144,7 @@
         }
     }
 
-    private void HandleSubmit()
+    private async Task HandleSubmit()
     {
         if (string.IsNullOrWhiteSpace(ApiKey))
         {
@@ -121,7 +152,7 @@
             return;
         }
 
-        //await ValidateAndProceed(ApiKey);
+        await ValidateAndProceed(ApiKey);
     }
 
     private async Task ValidateAndProceed(string apiKey)
@@ -130,14 +161,23 @@
         {
             // Here you would typically validate the API key with your backend
             // For now, we'll just store it and proceed
-            await LocalStorage.SetItemAsync("chatApiKey", apiKey);
+            var key = Guid.Parse(apiKey);
+            var token = await Mediator.Send(new GetJwtTokenCommand() { ApiKey = key });
+            await LocalStorage.SetItemAsync("chatApiKey", token);
             IsVisible = false;
-            await OnApiKeySubmitted.InvokeAsync(apiKey);
         }
         catch (Exception ex)
         {
             ErrorMessage = "Failed to validate API key";
-            Console.Error.WriteLine($"API key validation error: {ex.Message}");
+            Logger.LogError(ex, "Error happened during api token fetch");
+        }
+    }
+
+    private async Task Send()
+    {
+        if (_hubConnection is not null)
+        {
+            await _hubConnection.SendAsync("SendMessage", CurrentUserTag, TextToSend, CurrentRoomId);
         }
     }
     // private async Task SetAndInitializeAsync()
@@ -161,12 +201,6 @@
     //     await _hubConnection.StartAsync();
     // }
     //
-    // private async Task Send()
-    // {
-    //     if (_hubConnection is not null)
-    //     {
-    //         await _hubConnection.SendAsync("SendMessage", _tag, _messageInput, _identifier);
-    //     }
-    // }
+    
 
 }
