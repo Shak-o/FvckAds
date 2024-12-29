@@ -31,7 +31,7 @@ builder.Services.AddAuthentication(opt =>
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
-        ValidateLifetime = true,
+        ValidateLifetime = false, // TODO update to true
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = "WebClient",

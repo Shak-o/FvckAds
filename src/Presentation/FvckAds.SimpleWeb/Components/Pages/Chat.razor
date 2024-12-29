@@ -6,52 +6,200 @@
 @using MediatR
 @using Microsoft.AspNetCore.SignalR.Client
 @rendermode InteractiveServer
-<main class="main-chat-area">
-    <div class="placeholder-content">
-        <div class="chat-container">
-            <div class="chat-messages">
-                @foreach (var message in _messages)
-                {
-                    if (message.IsCurrent)
-                    {
-                        <div class="message outgoing">
-                            <div>
-                                <div class="message-content">
-                                    @message.Text
-                                </div>
-                                <div class="message-time">@message.Tag</div>
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="message incoming">
-                            <div class="message-avatar">J</div>
-                            <div>
-                                <div class="message-content">
-                                    @message.Text
-                                </div>
-                                <div class="message-time">@message.Tag</div>
-                            </div>
-                        </div>
 
-                    }
-                }
-            </div>
+<aside class="sidebar">
+    <div class="sidebar-content">
+        <div class="add-item-box">
+            <button class="add-item-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add New Chat
+            </button>
+        </div>
 
-            <div class="chat-input-container">
-                <div class="chat-input-wrapper">
-            <textarea class="chat-input"
-                      placeholder="Type a message..."
-                      rows="1" @bind="TextToSend"></textarea>
-                    <button class="send-button" @onclick="Send">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
-                    </button>
+        <!-- Example Chat Items -->
+        <div class="chat-items">
+            <!-- Chat Item 1 -->
+            @foreach (var room in _rooms)
+            {
+                <div class="chat-item">
+                    <div class="chat-item-header">
+                        <span class="chat-item-name">@room.Name</span>
+                        <span class="chat-item-count">@room.ThreadNames.Count</span>
+                    </div>
+                    <ul class="chat-item-list">
+                        @foreach (var threadItem in room.ThreadNames)
+                        {
+                            <li>@threadItem</li>
+                        }
+                    </ul>
                 </div>
+            }
+        </div>
+    </div>
+</aside>
+<main class="main-chat-area">
+    <div class="chat-container">
+        <!-- Main Chat Messages -->
+        <div class="chat-messages">
+            <!-- Thread Group 1 -->
+            @foreach (var thread in _messages)
+            {
+                <div class="thread-group" @onclick="() => SetCurrentThread(thread.Id)">
+                    <input type="hidden" name="threadId" id="currentThreadId" value="@thread.Id">
+                    <div class="message incoming thread-starter">
+                        <div class="message-avatar">J</div>
+                        <div class="message-wrapper">
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-author">
+                                        @if (!string.IsNullOrEmpty(thread.ThreadName))
+                                        {
+                                            @thread.ThreadName
+                                        }
+                                        @if (string.IsNullOrEmpty(thread.ThreadName))
+                                        {
+                                            <div>Default Thread</div>
+                                        }
+                                    </span>
+                                    <span class="message-time">10:30 AM</span>
+                                </div>
+                                @if (!string.IsNullOrEmpty(thread.Description))
+                                {
+                                    @thread.Description
+                                }
+                            </div>
+                            <div class="thread-info">
+                                <button class="thread-reply-btn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                         stroke-width="2">
+                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                    @thread.Messages.Count replies
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thread-replies">
+                        <div class="message outgoing thread-reply">
+                            <div class="message-wrapper">
+                                @foreach (var message in thread.Messages)
+                                {
+                                    <div class="message-content">
+                                        <div class="message-header">
+                                            <span class="message-author">
+                                                @if (message.IsCurrent)
+                                                {
+                                                    <div>You</div>
+                                                }
+                                                @if (!message.IsCurrent)
+                                                {
+                                                    @message.Tag
+                                                }
+                                            </span>
+                                            <span class="message-time">10:35 AM</span>
+                                        </div>
+                                        @message.Text
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            @* <div class="thread-group"> *@
+            @*     <!-- Original Message --> *@
+            @*     <div class="message incoming thread-starter"> *@
+            @*         <div class="message-avatar">J</div> *@
+            @*         <div class="message-wrapper"> *@
+            @*             <div class="message-content"> *@
+            @*                 <div class="message-header"> *@
+            @*                     <span class="message-author">John Doe</span> *@
+            @*                     <span class="message-time">10:30 AM</span> *@
+            @*                 </div> *@
+            @*                 Project Timeline Discussion *@
+            @*             </div> *@
+            @*             <div class="thread-info"> *@
+            @*                 <button class="thread-reply-btn"> *@
+            @*                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"> *@
+            @*                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path> *@
+            @*                     </svg> *@
+            @*                     3 replies *@
+            @*                 </button> *@
+            @*             </div> *@
+            @*         </div> *@
+            @*     </div> *@
+            @* *@
+            @*     <!-- Thread Replies (Collapsed by default) --> *@
+            @*     <div class="thread-replies"> *@
+            @*         <div class="message outgoing thread-reply"> *@
+            @*             <div class="message-wrapper"> *@
+            @*                 <div class="message-content"> *@
+            @*                     <div class="message-header"> *@
+            @*                         <span class="message-author">You</span> *@
+            @*                         <span class="message-time">10:35 AM</span> *@
+            @*                     </div> *@
+            @*                     I suggest we break it down into sprints *@
+            @*                 </div> *@
+            @*             </div> *@
+            @*         </div> *@
+            @*     </div> *@
+            @* </div> *@
+
+            <!-- Thread Group 2 -->
+            @* <div class="thread-group"> *@
+            @*     <!-- Original Message --> *@
+            @*     <div class="message incoming thread-starter"> *@
+            @*         <div class="message-avatar">A</div> *@
+            @*         <div class="message-wrapper"> *@
+            @*             <div class="message-content"> *@
+            @*                 <div class="message-header"> *@
+            @*                     <span class="message-author">Alice Smith</span> *@
+            @*                     <span class="message-time">11:15 AM</span> *@
+            @*                 </div> *@
+            @*                 Tech Stack Selection *@
+            @*             </div> *@
+            @*             <div class="thread-info"> *@
+            @*                 <button class="thread-reply-btn"> *@
+            @*                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"> *@
+            @*                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path> *@
+            @*                     </svg> *@
+            @*                     2 replies *@
+            @*                 </button> *@
+            @*             </div> *@
+            @*         </div> *@
+            @*     </div> *@
+            @* </div> *@
+        </div>
+
+        <!-- Chat Input -->
+        <!-- Replace the existing chat-input-container with this updated version -->
+        <div class="chat-input-container">
+            <div class="thread-type-toggle">
+                <button class="thread-type-btn active" data-type="reply">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 15h18M3 9h18"/>
+                    </svg>
+                    Reply in thread
+                </button>
+                <button class="thread-type-btn" data-type="new">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    New thread
+                </button>
+            </div>
+            <div class="chat-input-wrapper">
+                <textarea class="chat-input" placeholder="Start a new thread..." @bind="TextToSend"></textarea>
+                <button class="send-button" @onclick="Send">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
@@ -92,8 +240,9 @@
     private const string JwtLocalKey = "chatApiKey";
     private string TextToSend { get; set; } = string.Empty;
     private string CurrentUserTag { get; set; } = string.Empty;
-    private string CurrentRoomId { get; set; } = string.Empty;
-    
+    private string? CurrentRoomId { get; set; } = string.Empty;
+    private int CurrentThreadId { get; set; } = 0;
+
     [Inject] private NavigationManager NavigationManager { get; set; }
 
     [Inject] private ILocalStorageService LocalStorage { get; set; }
@@ -101,9 +250,18 @@
     [Inject] private IMediator Mediator { get; set; }
 
     [Inject] private ILogger<Chat> Logger { get; set; }
+    [Inject] private IConfiguration? Configuration { get; set; }
 
     private HubConnection? _hubConnection;
-    private List<MessageModel> _messages = new();
+    private List<MessageThread> _messages = new() { new() { ThreadName = "Default Thread", ThreadAuthor = "" } };
+    private readonly List<RoomModel> _rooms = [new RoomModel
+        {
+            Name = "Test",
+            ThreadNames = ["bla", "bla2"],
+            UniqueId = Guid.Parse("0f984faf-960f-4275-8a69-a23cefaf3c0c")
+        }
+    ]; //TODO: get rooms dynamically
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         // Check if API key exists in local storage
@@ -115,32 +273,48 @@
         }
         else
         {
-            CurrentRoomId = "0f984faf-960f-4275-8a69-a23cefaf3c0c";
+            CurrentRoomId = _rooms.FirstOrDefault()?.UniqueId.ToString();
+            if (CurrentRoomId == null)
+                return;
+
             var jwtHandler = new JwtSecurityTokenHandler();
             var token = jwtHandler.ReadJwtToken(storedToken);
-            
+
             CurrentUserTag = token.Claims.First(x => x.Type == "unique_name").Value;
-            var uri = new Uri("http://localhost:5078/chat?roomId=" + CurrentRoomId + "&tag=" + CurrentUserTag + "&access_token=" + storedToken);
-            Logger.LogInformation(uri.ToString());
+            var url = BuildUrl(storedToken);
+
             _hubConnection = new HubConnectionBuilder()
-                .WithUrl(uri)
+                .WithUrl(url)
                 .Build();
-            _hubConnection.On<string, string, Guid>("ReceiveMessage", (tag, text, identifier) =>
+            _hubConnection.On<string, string, int>("ReceiveMessage", (tag, text, threadId) =>
             {
                 var isCurrent = tag == CurrentUserTag;
-                _messages.Add(new (isCurrent, tag, text));
+                _messages.First(x => x.Id == threadId).Messages.Add(new(isCurrent, tag, text));
+                // TODO: invoke store api to save these messages
                 InvokeAsync(StateHasChanged);
             });
-            
+
             await _hubConnection.StartAsync();
         }
+    }
+
+    private void SetCurrentThread(int threadId)
+    {
+        CurrentThreadId = threadId;
+    }
+
+    private Uri BuildUrl(string storedToken)
+    {
+        var baseUrl = Configuration.GetSection("services:StreamManager:http")["0"];
+        var uri = new Uri($"{baseUrl}/chat?roomId=" + CurrentRoomId + "&tag=" + CurrentUserTag + "&access_token=" + storedToken);
+        return uri;
     }
 
     private async Task HandleKeyPress(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
         {
-            //await HandleSubmit();
+            await HandleSubmit();
         }
     }
 
@@ -177,30 +351,8 @@
     {
         if (_hubConnection is not null)
         {
-            await _hubConnection.SendAsync("SendMessage", CurrentUserTag, TextToSend, CurrentRoomId);
+            await _hubConnection.SendAsync("SendMessage", CurrentUserTag, TextToSend, CurrentRoomId, CurrentThreadId);
         }
     }
-    // private async Task SetAndInitializeAsync()
-    // {
-    //     var roomId = "0f984faf-960f-4275-8a69-a23cefaf3c0c";
-    //     var convert = Guid.Parse(roomId);
-    //     _identifier = convert;
-    //     var currentUserTag = _tag;
-    //     var uri = new Uri("http://localhost:5078/chat?roomId=" + roomId + "&tag=" + currentUserTag + "&access_token=");
-    //     _logger.LogInformation(uri.ToString());
-    //     _hubConnection = new HubConnectionBuilder()
-    //         .WithUrl(uri)
-    //         .Build();
-    //     _hubConnection.On<string, string, Guid>("ReceiveMessage", (tag, text, identifier) =>
-    //     {
-    //         var isCurrent = tag == currentUserTag;
-    //         _chat.Add((isCurrent, tag, text));
-    //         InvokeAsync(StateHasChanged);
-    //     });
-    //
-    //     await _hubConnection.StartAsync();
-    // }
-    //
-    
 
 }

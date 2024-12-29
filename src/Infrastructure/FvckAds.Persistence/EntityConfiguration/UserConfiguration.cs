@@ -12,5 +12,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(x => x.Tag).HasMaxLength(50);
         builder.HasIndex(x => x.Tag).IsUnique();
+        builder.Property(x => x.Title).HasMaxLength(50);
     }
 }
