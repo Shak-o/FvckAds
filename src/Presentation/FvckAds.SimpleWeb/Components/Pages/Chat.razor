@@ -2,6 +2,7 @@
 @using System.IdentityModel.Tokens.Jwt
 @using Blazored.LocalStorage
 @using FvckAds.Client.Application.WebClient.Authentications.Commands
+@using FvckAds.Client.Application.WebClient.UserManagement
 @using FvckAds.SimpleWeb.Components.Models
 @using MediatR
 @using Microsoft.AspNetCore.SignalR.Client
@@ -26,7 +27,7 @@
             {
                 <div class="chat-item">
                     <div class="chat-item-header">
-                        <span class="chat-item-name">@room.Name</span>
+                        <span class="chat-item-name">@room.RoomName</span>
                         <span class="chat-item-count">@room.ThreadNames.Count</span>
                     </div>
                     <ul class="chat-item-list">
@@ -208,16 +209,12 @@
     private HubConnection? _hubConnection;
     private List<MessageThread> _messages = new() { new() { ThreadName = "Default Thread", ThreadAuthor = "" , Id = Guid.Empty } };
 
-    private readonly List<RoomModel> _rooms =
+    private List<RoomModel> _rooms =
     [
-        new RoomModel
-        {
-            Name = "Test",
-            ThreadNames = ["bla", "bla2"],
-            UniqueId = Guid.Parse("0f984faf-960f-4275-8a69-a23cefaf3c0c")
-        }
+        
     ]; //TODO: get rooms dynamically
 
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         // Check if API key exists in local storage
@@ -229,10 +226,13 @@
         }
         else
         {
-            CurrentRoomId = _rooms.FirstOrDefault()?.UniqueId.ToString();
+            var roomsResult = await Mediator.Send(new GetRoomsQuery() { Token = storedToken });
+            if (roomsResult != null)
+                _rooms = roomsResult;
+            CurrentRoomId = _rooms.FirstOrDefault()?.Identifier.ToString();
             if (CurrentRoomId == null)
                 return;
-
+            StateHasChanged();
             var jwtHandler = new JwtSecurityTokenHandler();
             var token = jwtHandler.ReadJwtToken(storedToken);
 
