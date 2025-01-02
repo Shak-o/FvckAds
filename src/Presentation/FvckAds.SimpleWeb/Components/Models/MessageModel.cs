@@ -17,7 +17,7 @@ public class MessageModel
 
 public class MessageThread
 {
-    public int Id { get; set; } = 0; // default 0
+    public Guid Id { get; set; }
     public required string ThreadName { get; set; }
     public required string ThreadAuthor { get; set; }
     public string? Description { get; set; }

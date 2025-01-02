@@ -34,10 +34,17 @@ public class ChatHub(IMediator mediator) : Hub<IChatClient>
         await base.OnConnectedAsync();
     }
 
-    public async Task SendMessage(string tag, string message, string identifier, int threadId)
+    public async Task SendMessage(string tag, string message, string identifier, Guid threadId)
     {
         var parsed = Guid.Parse(identifier);
         var connectionIds = await mediator.Send(new GetRoomUserConnections() { RoomId = parsed });
         await Clients.Clients(connectionIds).ReceiveMessage(tag, message, threadId);
+    }
+
+    public async Task SetNewThread(string roomId, Guid threadId, string threadName, string threadAuthor, string description)
+    {
+        var parsed = Guid.Parse(roomId);
+        var connectionIds = await mediator.Send(new GetRoomUserConnections() { RoomId = parsed });
+        await Clients.Clients(connectionIds).AddNewThread(threadId, threadName, threadAuthor, description);
     }
 }

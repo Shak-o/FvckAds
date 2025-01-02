@@ -109,82 +109,19 @@
                     </div>
                 </div>
             }
-            @* <div class="thread-group"> *@
-            @*     <!-- Original Message --> *@
-            @*     <div class="message incoming thread-starter"> *@
-            @*         <div class="message-avatar">J</div> *@
-            @*         <div class="message-wrapper"> *@
-            @*             <div class="message-content"> *@
-            @*                 <div class="message-header"> *@
-            @*                     <span class="message-author">John Doe</span> *@
-            @*                     <span class="message-time">10:30 AM</span> *@
-            @*                 </div> *@
-            @*                 Project Timeline Discussion *@
-            @*             </div> *@
-            @*             <div class="thread-info"> *@
-            @*                 <button class="thread-reply-btn"> *@
-            @*                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"> *@
-            @*                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path> *@
-            @*                     </svg> *@
-            @*                     3 replies *@
-            @*                 </button> *@
-            @*             </div> *@
-            @*         </div> *@
-            @*     </div> *@
-            @* *@
-            @*     <!-- Thread Replies (Collapsed by default) --> *@
-            @*     <div class="thread-replies"> *@
-            @*         <div class="message outgoing thread-reply"> *@
-            @*             <div class="message-wrapper"> *@
-            @*                 <div class="message-content"> *@
-            @*                     <div class="message-header"> *@
-            @*                         <span class="message-author">You</span> *@
-            @*                         <span class="message-time">10:35 AM</span> *@
-            @*                     </div> *@
-            @*                     I suggest we break it down into sprints *@
-            @*                 </div> *@
-            @*             </div> *@
-            @*         </div> *@
-            @*     </div> *@
-            @* </div> *@
-
-            <!-- Thread Group 2 -->
-            @* <div class="thread-group"> *@
-            @*     <!-- Original Message --> *@
-            @*     <div class="message incoming thread-starter"> *@
-            @*         <div class="message-avatar">A</div> *@
-            @*         <div class="message-wrapper"> *@
-            @*             <div class="message-content"> *@
-            @*                 <div class="message-header"> *@
-            @*                     <span class="message-author">Alice Smith</span> *@
-            @*                     <span class="message-time">11:15 AM</span> *@
-            @*                 </div> *@
-            @*                 Tech Stack Selection *@
-            @*             </div> *@
-            @*             <div class="thread-info"> *@
-            @*                 <button class="thread-reply-btn"> *@
-            @*                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"> *@
-            @*                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path> *@
-            @*                     </svg> *@
-            @*                     2 replies *@
-            @*                 </button> *@
-            @*             </div> *@
-            @*         </div> *@
-            @*     </div> *@
-            @* </div> *@
         </div>
 
         <!-- Chat Input -->
         <!-- Replace the existing chat-input-container with this updated version -->
         <div class="chat-input-container">
             <div class="thread-type-toggle">
-                <button class="thread-type-btn active" data-type="reply">
+                <button class="@ClassForCurrenThreadBtton" data-type="reply" @onclick="() => { IsNewThread = false; }">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 15h18M3 9h18"/>
                     </svg>
                     Reply in thread
                 </button>
-                <button class="thread-type-btn" data-type="new">
+                <button class="@ClassForNewThreadButton" data-type="new" @onclick="() => { IsNewThread = true; }">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -234,6 +171,12 @@
 }
 
 @code {
+    [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private ILocalStorageService LocalStorage { get; set; }
+    [Inject] private IMediator Mediator { get; set; }
+    [Inject] private ILogger<Chat> Logger { get; set; }
+    [Inject] private IConfiguration? Configuration { get; set; }
+
     private bool IsVisible { get; set; } = false;
     private string ApiKey { get; set; } = string.Empty;
     private string ErrorMessage { get; set; } = string.Empty;
@@ -241,20 +184,33 @@
     private string TextToSend { get; set; } = string.Empty;
     private string CurrentUserTag { get; set; } = string.Empty;
     private string? CurrentRoomId { get; set; } = string.Empty;
-    private int CurrentThreadId { get; set; } = 0;
+    private Guid CurrentThreadId { get; set; } = Guid.Empty;
+    private bool IsNewThread { get; set; }
 
-    [Inject] private NavigationManager NavigationManager { get; set; }
+    private string ClassForNewThreadButton
+    {
+        get { return IsNewThread ? "thread-type-btn active" : "thread-type-btn"; }
+    }
 
-    [Inject] private ILocalStorageService LocalStorage { get; set; }
+    private string ClassForCurrenThreadBtton
+    {
+        get { return !IsNewThread ? "thread-type-btn active" : "thread-type-btn"; }
+    }
 
-    [Inject] private IMediator Mediator { get; set; }
-
-    [Inject] private ILogger<Chat> Logger { get; set; }
-    [Inject] private IConfiguration? Configuration { get; set; }
+    private string InpuTvalue
+    {
+        get
+        {
+            return IsNewThread ? "Thread name: \n" : "";
+        }
+    }
 
     private HubConnection? _hubConnection;
-    private List<MessageThread> _messages = new() { new() { ThreadName = "Default Thread", ThreadAuthor = "" } };
-    private readonly List<RoomModel> _rooms = [new RoomModel
+    private List<MessageThread> _messages = new() { new() { ThreadName = "Default Thread", ThreadAuthor = "" , Id = Guid.Empty } };
+
+    private readonly List<RoomModel> _rooms =
+    [
+        new RoomModel
         {
             Name = "Test",
             ThreadNames = ["bla", "bla2"],
@@ -286,11 +242,26 @@
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl(url)
                 .Build();
-            _hubConnection.On<string, string, int>("ReceiveMessage", (tag, text, threadId) =>
+
+            _hubConnection.On<Guid, string, string, string>("AddNewThread", (threadId, threadName, author, description) =>
+            {
+                if (_messages.Any(x => x.Id == threadId))
+                    return;
+                _messages.Add(new MessageThread
+                {
+                    Id = threadId,
+                    ThreadName = threadName,
+                    ThreadAuthor = author,
+                    Description = description
+                });
+                InvokeAsync(StateHasChanged);
+            });
+            
+            _hubConnection.On<string, string, Guid>("ReceiveMessage", (tag, text, threadId) =>
             {
                 var isCurrent = tag == CurrentUserTag;
-                _messages.First(x => x.Id == threadId).Messages.Add(new(isCurrent, tag, text));
-                // TODO: invoke store api to save these messages
+                var thread = _messages.First(x => x.Id == threadId);
+                thread.Messages.Add(new(isCurrent, tag, text));
                 InvokeAsync(StateHasChanged);
             });
 
@@ -298,7 +269,7 @@
         }
     }
 
-    private void SetCurrentThread(int threadId)
+    private void SetCurrentThread(Guid threadId)
     {
         CurrentThreadId = threadId;
     }
@@ -349,9 +320,28 @@
 
     private async Task Send()
     {
-        if (_hubConnection is not null)
+        var textToSend = TextToSend;
+        if (_hubConnection is null)
+            return;
+        if (IsNewThread)
         {
-            await _hubConnection.SendAsync("SendMessage", CurrentUserTag, TextToSend, CurrentRoomId, CurrentThreadId);
+            var split = TextToSend.Split("\n");
+            var threadName = split[0];
+            textToSend = split[1];
+            var newThread = new MessageThread
+            {
+                Id = Guid.NewGuid(),
+                ThreadName = threadName,
+                ThreadAuthor = CurrentUserTag
+            };
+            _messages.Add(newThread);
+            CurrentThreadId = newThread.Id;
+            await _hubConnection.SendAsync("SetNewThread", CurrentRoomId, CurrentThreadId, threadName, CurrentUserTag, "");
+            await _hubConnection.SendAsync("SendMessage", CurrentUserTag, textToSend, CurrentRoomId, CurrentThreadId);
+        }
+        else
+        {
+            await _hubConnection.SendAsync("SendMessage", CurrentUserTag, textToSend, CurrentRoomId, CurrentThreadId);
         }
     }
 
