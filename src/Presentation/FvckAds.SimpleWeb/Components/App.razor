@@ -79,7 +79,29 @@
             background-color: var(--background-color);
             overflow: hidden;
         }
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* Or 100% if parent has defined height */
+            position: relative;
+            background-color: #F7FAFC;
+        }
+        .threads-container {
+            scrollbar-width: thin;
+            scrollbar-color: #CBD5E0 transparent;
+        }
+        .threads-container::-webkit-scrollbar {
+            width: 6px;
+        }
 
+        .threads-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .threads-container::-webkit-scrollbar-thumb {
+            background-color: #CBD5E0;
+            border-radius: 3px;
+        }
         .app-footer {
             height: var(--footer-height);
             border-top: 1px solid #E2E8F0;
@@ -156,19 +178,22 @@
         
         /* Thread Group */
         .thread-group {
-            margin-bottom: 1.5rem;
-            background-color: white;
-            border-radius: 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 1rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
         }
 
         /* Message Styles */
         .message {
-            display: flex;
             padding: 1rem;
+            display: flex;
+            gap: 1rem;
         }
-
+        .thread-replies {
+            padding-left: 1rem;
+            border-top: 1px solid #E2E8F0;
+        }
         .message.thread-starter {
             background-color: white;
         }
@@ -193,13 +218,11 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background-color: #CBD5E0;
+            background: #4A5568;
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            color: white;
-            margin-right: 0.75rem;
         }
 
         .message-wrapper {
@@ -207,16 +230,17 @@
         }
 
         .message-content {
-            padding: 0.5rem 0;
+            flex: 1;
         }
-
         .message-header {
             display: flex;
-            align-items: center;
-            margin-bottom: 0.25rem;
             gap: 0.5rem;
+            margin-bottom: 0.25rem;
         }
-
+        .message-time {
+            color: #718096;
+            font-size: 0.875rem;
+        }
         .message-author {
             font-weight: 600;
             color: #2D3748;
@@ -250,19 +274,20 @@
         }
 
         .thread-replies {
+            padding-left: 1rem;
             border-top: 1px solid #E2E8F0;
         }
 
         /* Chat Input (keeping previous styles) */
         .chat-input-container {
-            position: absolute;
+            position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 1rem 1.5rem;
-            background-color: white;
+            background: white;
+            padding: 1rem;
             border-top: 1px solid #E2E8F0;
-            z-index: 10; /* Ensures input stays above messages */
+            z-index: 100;
         }
 
         .chat-input-wrapper {
@@ -273,11 +298,10 @@
         .chat-input {
             flex: 1;
             border: 1px solid #E2E8F0;
-            border-radius: 1.5rem;
-            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            padding: 0.5rem;
             resize: none;
-            max-height: 100px;
-            overflow-y: auto;
+            min-height: 40px;
         }
 
         .chat-input:focus {
@@ -521,11 +545,13 @@
         }
         .thread-type-toggle {
             display: flex;
-            gap: 1rem;
-            padding: 0 0.5rem;
-            margin-bottom: 0.75rem;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
         }
-
+        .chat-input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+        }
         .thread-type-btn {
             display: flex;
             align-items: center;

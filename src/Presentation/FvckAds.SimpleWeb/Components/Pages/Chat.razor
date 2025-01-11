@@ -42,19 +42,17 @@
     </div>
 </aside>
 <main class="main-chat-area">
-    <div class="chat-container">
-        <!-- Main Chat Messages -->
-        <div class="chat-messages">
-            <!-- Thread Group 1 -->
-            @foreach (var thread in _messages)
-            {
-                <div class="thread-group" @onclick="() => SetCurrentThread(thread.Id)">
-                    <input type="hidden" name="threadId" id="currentThreadId" value="@thread.Id">
-                    <div class="message incoming thread-starter">
-                        <div class="message-avatar">J</div>
-                        <div class="message-wrapper">
-                            <div class="message-content">
-                                <div class="message-header">
+    <div class="threads-container">
+        <!-- Thread Group 1 -->
+        @foreach (var thread in _messages)
+        {
+            <div class="thread-group" @onclick="() => SetCurrentThread(thread.Id)">
+                <input type="hidden" name="threadId" id="currentThreadId" value="@thread.Id">
+                <div class="message incoming thread-starter">
+                    <div class="message-avatar">J</div>
+                    <div class="message-wrapper">
+                        <div class="message-content">
+                            <div class="message-header">
                                     <span class="message-author">
                                         @if (!string.IsNullOrEmpty(thread.ThreadName))
                                         {
@@ -65,31 +63,31 @@
                                             <div>Default Thread</div>
                                         }
                                     </span>
-                                    <span class="message-time">10:30 AM</span>
-                                </div>
-                                @if (!string.IsNullOrEmpty(thread.Description))
-                                {
-                                    @thread.Description
-                                }
+                                <span class="message-time">10:30 AM</span>
                             </div>
-                            <div class="thread-info">
-                                <button class="thread-reply-btn">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                         stroke-width="2">
-                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                                    </svg>
-                                    @thread.Messages.Count replies
-                                </button>
-                            </div>
+                            @if (!string.IsNullOrEmpty(thread.ThreadAuthor))
+                            {
+                                @thread.ThreadAuthor
+                            }
+                        </div>
+                        <div class="thread-info">
+                            <button class="thread-reply-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                                @thread.Messages.Count replies
+                            </button>
                         </div>
                     </div>
-                    <div class="thread-replies">
-                        <div class="message outgoing thread-reply">
-                            <div class="message-wrapper">
-                                @foreach (var message in thread.Messages)
-                                {
-                                    <div class="message-content">
-                                        <div class="message-header">
+                </div>
+                <div class="thread-replies">
+                    <div class="message outgoing thread-reply">
+                        <div class="message-wrapper">
+                            @foreach (var message in thread.Messages)
+                            {
+                                <div class="message-content">
+                                    <div class="message-header">
                                             <span class="message-author">
                                                 @if (message.IsCurrent)
                                                 {
@@ -100,17 +98,17 @@
                                                     @message.Tag
                                                 }
                                             </span>
-                                            <span class="message-time">10:35 AM</span>
-                                        </div>
-                                        @message.Text
+                                        <span class="message-time">10:35 AM</span>
                                     </div>
-                                }
-                            </div>
+                                    @message.Text
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
-            }
-        </div>
+            </div>
+        }
+
 
         <!-- Chat Input -->
         <!-- Replace the existing chat-input-container with this updated version -->
@@ -187,6 +185,7 @@
     private string? CurrentRoomId { get; set; } = string.Empty;
     private Guid CurrentThreadId { get; set; } = Guid.Empty;
     private bool IsNewThread { get; set; }
+    private string? StoredToken { get; set; } = string.Empty;
 
     private string ClassForNewThreadButton
     {
@@ -200,72 +199,80 @@
 
     private string InpuTvalue
     {
-        get
-        {
-            return IsNewThread ? "Thread name: \n" : "";
-        }
+        get { return IsNewThread ? "Thread name: \n" : ""; }
     }
 
     private HubConnection? _hubConnection;
-    private List<MessageThread> _messages = new() { new() { ThreadName = "Default Thread", ThreadAuthor = "" , Id = Guid.Empty } };
+    private List<MessageThread> _messages = new() { new() { ThreadName = "Default Thread", ThreadAuthor = "", Id = Guid.Empty } };
 
     private List<RoomModel> _rooms =
     [
-        
     ]; //TODO: get rooms dynamically
 
-    
+    public async Task InitializeAfterRender()
+    {
+        await base.OnInitializedAsync();
+        // Check if API key exists in local storage
+
+        if (IsVisible || string.IsNullOrEmpty(StoredToken))
+        {
+            return;
+        }
+
+        var roomsResult = await Mediator.Send(new GetRoomsQuery() { Token = StoredToken });
+        if (roomsResult != null)
+            _rooms = roomsResult;
+        CurrentRoomId = _rooms.FirstOrDefault()?.Identifier.ToString();
+        if (CurrentRoomId == null)
+            return;
+        StateHasChanged();
+        var jwtHandler = new JwtSecurityTokenHandler();
+        var token = jwtHandler.ReadJwtToken(StoredToken);
+
+        CurrentUserTag = token.Claims.First(x => x.Type == "unique_name").Value;
+        var url = BuildUrl(StoredToken);
+
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(url)
+            .Build();
+
+        _hubConnection.On<Guid, string, string, string>("AddNewThread", (threadId, threadName, author, description) =>
+        {
+            if (_messages.Any(x => x.Id == threadId))
+                return;
+            _messages.Add(new MessageThread
+            {
+                Id = threadId,
+                ThreadName = threadName,
+                ThreadAuthor = author,
+                Description = description
+            });
+            InvokeAsync(StateHasChanged);
+        });
+
+        _hubConnection.On<string, string, Guid>("ReceiveMessage", (tag, text, threadId) =>
+        {
+            var isCurrent = tag == CurrentUserTag;
+            var thread = _messages.First(x => x.Id == threadId);
+            thread.Messages.Add(new(isCurrent, tag, text));
+            InvokeAsync(StateHasChanged);
+        });
+
+        await _hubConnection.StartAsync();
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // Check if API key exists in local storage
-        var storedToken = await LocalStorage.GetItemAsync<string>(JwtLocalKey);
-        if (string.IsNullOrEmpty(storedToken))
+        StoredToken = await LocalStorage.GetItemAsync<string>(JwtLocalKey);
+        if (string.IsNullOrEmpty(StoredToken))
         {
             IsVisible = true;
             StateHasChanged();
         }
         else
         {
-            var roomsResult = await Mediator.Send(new GetRoomsQuery() { Token = storedToken });
-            if (roomsResult != null)
-                _rooms = roomsResult;
-            CurrentRoomId = _rooms.FirstOrDefault()?.Identifier.ToString();
-            if (CurrentRoomId == null)
-                return;
-            StateHasChanged();
-            var jwtHandler = new JwtSecurityTokenHandler();
-            var token = jwtHandler.ReadJwtToken(storedToken);
-
-            CurrentUserTag = token.Claims.First(x => x.Type == "unique_name").Value;
-            var url = BuildUrl(storedToken);
-
-            _hubConnection = new HubConnectionBuilder()
-                .WithUrl(url)
-                .Build();
-
-            _hubConnection.On<Guid, string, string, string>("AddNewThread", (threadId, threadName, author, description) =>
-            {
-                if (_messages.Any(x => x.Id == threadId))
-                    return;
-                _messages.Add(new MessageThread
-                {
-                    Id = threadId,
-                    ThreadName = threadName,
-                    ThreadAuthor = author,
-                    Description = description
-                });
-                InvokeAsync(StateHasChanged);
-            });
-            
-            _hubConnection.On<string, string, Guid>("ReceiveMessage", (tag, text, threadId) =>
-            {
-                var isCurrent = tag == CurrentUserTag;
-                var thread = _messages.First(x => x.Id == threadId);
-                thread.Messages.Add(new(isCurrent, tag, text));
-                InvokeAsync(StateHasChanged);
-            });
-
-            await _hubConnection.StartAsync();
+            if (firstRender)
+                await InitializeAfterRender();
         }
     }
 
