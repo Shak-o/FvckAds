@@ -112,31 +112,37 @@
 
         <!-- Chat Input -->
         <!-- Replace the existing chat-input-container with this updated version -->
-        <div class="chat-input-container">
-            <div class="thread-type-toggle">
-                <button class="@ClassForCurrenThreadBtton" data-type="reply" @onclick="() => { IsNewThread = false; }">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 15h18M3 9h18"/>
-                    </svg>
-                    Reply in thread
-                </button>
-                <button class="@ClassForNewThreadButton" data-type="new" @onclick="() => { IsNewThread = true; }">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    New thread
-                </button>
-            </div>
-            <div class="chat-input-wrapper">
-                <textarea class="chat-input" placeholder="Start a new thread..." @bind="TextToSend"></textarea>
-                <button class="send-button" @onclick="Send">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                    </svg>
-                </button>
-            </div>
+       
+    </div>
+    <div class="chat-input-container">
+        <div class="thread-type-toggle">
+            <button class="@ClassForCurrenThreadBtton" data-type="reply" @onclick="() => { IsNewThread = false; }">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 15h18M3 9h18"/>
+                </svg>
+                Reply in thread
+            </button>
+            <button class="@ClassForNewThreadButton" data-type="new" @onclick="() => { IsNewThread = true; }">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                New thread
+            </button>
+            <span class="chat-item-name">Now Selected: @SelectedChatName</span>
+        </div>
+        <div class="chat-input-wrapper">
+            @if (IsNewThread)
+            {
+                <input class="small-input-actual" placeholder="New thread name" @bind="NewThreadName"/>
+            }
+            <textarea class="chat-input" placeholder="Start a new thread..." @bind="TextToSend"></textarea>
+            <button class="send-button" @onclick="Send">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
         </div>
     </div>
 </main>
@@ -150,7 +156,7 @@
 
             <div class="api-input-group">
                 <input type="password"
-                       class="api-key-input"
+                       class="small-input"
                        placeholder="Enter your API key"
                        @bind="ApiKey"
                        @bind:event="oninput"
@@ -185,6 +191,16 @@
     private string? CurrentRoomId { get; set; } = string.Empty;
     private Guid CurrentThreadId { get; set; } = Guid.Empty;
     private bool IsNewThread { get; set; }
+    private string? NewThreadName { get; set; }
+
+    private string? SelectedChatName
+    {
+        get
+        {
+            return _messages.FirstOrDefault(x => x.Id == CurrentThreadId)?.ThreadName;
+        }
+    }
+
     private string? StoredToken { get; set; } = string.Empty;
 
     private string ClassForNewThreadButton
@@ -219,9 +235,8 @@
             return;
         }
 
-        var roomsResult = await Mediator.Send(new GetRoomsQuery() { Token = StoredToken });
-        if (roomsResult != null)
-            _rooms = roomsResult;
+        var roomsResult = await Mediator.Send(new GetRoomsQuery() { Token = StoredToken }); 
+        _rooms = roomsResult;
         CurrentRoomId = _rooms.FirstOrDefault()?.Identifier.ToString();
         if (CurrentRoomId == null)
             return;
@@ -332,18 +347,16 @@
             return;
         if (IsNewThread)
         {
-            var split = TextToSend.Split("\n");
-            var threadName = split[0];
-            textToSend = split[1];
+            textToSend = TextToSend;
             var newThread = new MessageThread
             {
                 Id = Guid.NewGuid(),
-                ThreadName = threadName,
+                ThreadName = NewThreadName,
                 ThreadAuthor = CurrentUserTag
             };
             _messages.Add(newThread);
             CurrentThreadId = newThread.Id;
-            await _hubConnection.SendAsync("SetNewThread", CurrentRoomId, CurrentThreadId, threadName, CurrentUserTag, "");
+            await _hubConnection.SendAsync("SetNewThread", CurrentRoomId, CurrentThreadId, NewThreadName, CurrentUserTag, "");
             await _hubConnection.SendAsync("SendMessage", CurrentUserTag, textToSend, CurrentRoomId, CurrentThreadId);
         }
         else

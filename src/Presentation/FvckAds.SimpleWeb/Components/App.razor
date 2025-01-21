@@ -181,6 +181,7 @@
             background: white;
             border-radius: 8px;
             margin-bottom: 1rem;
+            margin-left: 0.5rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
@@ -377,7 +378,7 @@
             margin-bottom: 1.5rem;
         }
 
-        .api-key-input {
+        .small-input {
             width: 100%;
             padding: 0.75rem 1rem;
             border: 1px solid #E2E8F0;
@@ -386,11 +387,26 @@
             transition: border-color 0.2s;
         }
 
-        .api-key-input:focus {
+        .small-input:focus {
             outline: none;
             border-color: var(--accent-color);
         }
 
+
+        .small-input-actually {
+            width: 20%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .small-input-actually:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
         .api-key-hint {
             display: block;
             margin-top: 0.5rem;
