@@ -1,0 +1,368 @@
+@page "/Chat"
+@using System.IdentityModel.Tokens.Jwt
+@using Blazored.LocalStorage
+@using FvckAds.Client.Application.WebClient.Authentications.Commands
+@using FvckAds.Client.Application.WebClient.UserManagement
+@using FvckAds.SimpleWeb.Components.Models
+@using MediatR
+@using Microsoft.AspNetCore.SignalR.Client
+@rendermode InteractiveServer
+
+<aside class="sidebar">
+    <div class="sidebar-content">
+        <div class="add-item-box">
+            <button class="add-item-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add New Chat
+            </button>
+        </div>
+
+        <!-- Example Chat Items -->
+        <div class="chat-items">
+            <!-- Chat Item 1 -->
+            @foreach (var room in _rooms)
+            {
+                <div class="chat-item">
+                    <div class="chat-item-header">
+                        <span class="chat-item-name">@room.RoomName</span>
+                        <span class="chat-item-count">@room.ThreadNames.Count</span>
+                    </div>
+                    <ul class="chat-item-list">
+                        @foreach (var threadItem in room.ThreadNames)
+                        {
+                            <li>@threadItem</li>
+                        }
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
+</aside>
+<main class="main-chat-area">
+    <div class="threads-container">
+        <!-- Thread Group 1 -->
+        @foreach (var thread in _messages)
+        {
+            <div class="thread-group" @onclick="() => SetCurrentThread(thread.Id)">
+                <input type="hidden" name="threadId" id="currentThreadId" value="@thread.Id">
+                <div class="message incoming thread-starter">
+                    <div class="message-avatar">J</div>
+                    <div class="message-wrapper">
+                        <div class="message-content">
+                            <div class="message-header">
+                                    <span class="message-author">
+                                        @if (!string.IsNullOrEmpty(thread.ThreadName))
+                                        {
+                                            @thread.ThreadName
+                                        }
+                                        @if (string.IsNullOrEmpty(thread.ThreadName))
+                                        {
+                                            <div>Default Thread</div>
+                                        }
+                                    </span>
+                                <span class="message-time">10:30 AM</span>
+                            </div>
+                            @if (!string.IsNullOrEmpty(thread.ThreadAuthor))
+                            {
+                                @thread.ThreadAuthor
+                            }
+                        </div>
+                        <div class="thread-info">
+                            <button class="thread-reply-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                                @thread.Messages.Count replies
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="thread-replies">
+                    <div class="message outgoing thread-reply">
+                        <div class="message-wrapper">
+                            @foreach (var message in thread.Messages)
+                            {
+                                <div class="message-content">
+                                    <div class="message-header">
+                                            <span class="message-author">
+                                                @if (message.IsCurrent)
+                                                {
+                                                    <div>You</div>
+                                                }
+                                                @if (!message.IsCurrent)
+                                                {
+                                                    @message.Tag
+                                                }
+                                            </span>
+                                        <span class="message-time">10:35 AM</span>
+                                    </div>
+                                    @message.Text
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+
+        <!-- Chat Input -->
+        <!-- Replace the existing chat-input-container with this updated version -->
+       
+    </div>
+    <div class="chat-input-container">
+        <div class="thread-type-toggle">
+            <button class="@ClassForCurrenThreadBtton" data-type="reply" @onclick="() => { IsNewThread = false; }">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 15h18M3 9h18"/>
+                </svg>
+                Reply in thread
+            </button>
+            <button class="@ClassForNewThreadButton" data-type="new" @onclick="() => { IsNewThread = true; }">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                New thread
+            </button>
+            <span class="chat-item-name">Now Selected: @SelectedChatName</span>
+        </div>
+        <div class="chat-input-wrapper">
+            @if (IsNewThread)
+            {
+                <input class="small-input-actual" placeholder="New thread name" @bind="NewThreadName"/>
+            }
+            <textarea class="chat-input" placeholder="Start a new thread..." @bind="TextToSend"></textarea>
+            <button class="send-button" @onclick="Send">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+</main>
+
+@if (IsVisible)
+{
+    <div class="api-modal-overlay">
+        <div class="api-modal">
+            <h2 class="api-modal-title">Enter API Key</h2>
+            <p class="api-modal-description">Please enter your API key to access the chat</p>
+
+            <div class="api-input-group">
+                <input type="password"
+                       class="small-input"
+                       placeholder="Enter your API key"
+                       @bind="ApiKey"
+                       @bind:event="oninput"
+                       @onkeypress="HandleKeyPress"/>
+                @if (!string.IsNullOrEmpty(ErrorMessage))
+                {
+                    <small class="api-key-error">@ErrorMessage</small>
+                }
+                <small class="api-key-hint">Your API key will be securely stored</small>
+            </div>
+
+            <button class="api-submit-btn" @onclick="HandleSubmit">
+                Continue to Chat
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private ILocalStorageService LocalStorage { get; set; }
+    [Inject] private IMediator Mediator { get; set; }
+    [Inject] private ILogger<Chat> Logger { get; set; }
+    [Inject] private IConfiguration? Configuration { get; set; }
+
+    private bool IsVisible { get; set; } = false;
+    private string ApiKey { get; set; } = string.Empty;
+    private string ErrorMessage { get; set; } = string.Empty;
+    private const string JwtLocalKey = "chatApiKey";
+    private string TextToSend { get; set; } = string.Empty;
+    private string CurrentUserTag { get; set; } = string.Empty;
+    private string? CurrentRoomId { get; set; } = string.Empty;
+    private Guid CurrentThreadId { get; set; } = Guid.Empty;
+    private bool IsNewThread { get; set; }
+    private string? NewThreadName { get; set; }
+
+    private string? SelectedChatName
+    {
+        get
+        {
+            return _messages.FirstOrDefault(x => x.Id == CurrentThreadId)?.ThreadName;
+        }
+    }
+
+    private string? StoredToken { get; set; } = string.Empty;
+
+    private string ClassForNewThreadButton
+    {
+        get { return IsNewThread ? "thread-type-btn active" : "thread-type-btn"; }
+    }
+
+    private string ClassForCurrenThreadBtton
+    {
+        get { return !IsNewThread ? "thread-type-btn active" : "thread-type-btn"; }
+    }
+
+    private string InpuTvalue
+    {
+        get { return IsNewThread ? "Thread name: \n" : ""; }
+    }
+
+    private HubConnection? _hubConnection;
+    private List<MessageThread> _messages = new() { new() { ThreadName = "Default Thread", ThreadAuthor = "", Id = Guid.Empty } };
+
+    private List<RoomModel> _rooms =
+    [
+    ]; //TODO: get rooms dynamically
+
+    public async Task InitializeAfterRender()
+    {
+        await base.OnInitializedAsync();
+        // Check if API key exists in local storage
+
+        if (IsVisible || string.IsNullOrEmpty(StoredToken))
+        {
+            return;
+        }
+
+        var roomsResult = await Mediator.Send(new GetRoomsQuery() { Token = StoredToken }); 
+        _rooms = roomsResult;
+        CurrentRoomId = _rooms.FirstOrDefault()?.Identifier.ToString();
+        if (CurrentRoomId == null)
+            return;
+        StateHasChanged();
+        var jwtHandler = new JwtSecurityTokenHandler();
+        var token = jwtHandler.ReadJwtToken(StoredToken);
+
+        CurrentUserTag = token.Claims.First(x => x.Type == "unique_name").Value;
+        var url = BuildUrl(StoredToken);
+
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(url)
+            .Build();
+
+        _hubConnection.On<Guid, string, string, string>("AddNewThread", (threadId, threadName, author, description) =>
+        {
+            if (_messages.Any(x => x.Id == threadId))
+                return;
+            _messages.Add(new MessageThread
+            {
+                Id = threadId,
+                ThreadName = threadName,
+                ThreadAuthor = author,
+                Description = description
+            });
+            InvokeAsync(StateHasChanged);
+        });
+
+        _hubConnection.On<string, string, Guid>("ReceiveMessage", (tag, text, threadId) =>
+        {
+            var isCurrent = tag == CurrentUserTag;
+            var thread = _messages.First(x => x.Id == threadId);
+            thread.Messages.Add(new(isCurrent, tag, text));
+            InvokeAsync(StateHasChanged);
+        });
+
+        await _hubConnection.StartAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        StoredToken = await LocalStorage.GetItemAsync<string>(JwtLocalKey);
+        if (string.IsNullOrEmpty(StoredToken))
+        {
+            IsVisible = true;
+            StateHasChanged();
+        }
+        else
+        {
+            if (firstRender)
+                await InitializeAfterRender();
+        }
+    }
+
+    private void SetCurrentThread(Guid threadId)
+    {
+        CurrentThreadId = threadId;
+    }
+
+    private Uri BuildUrl(string storedToken)
+    {
+        var baseUrl = Configuration.GetSection("services:StreamManager:http")["0"];
+        var uri = new Uri($"{baseUrl}/chat?roomId=" + CurrentRoomId + "&tag=" + CurrentUserTag + "&access_token=" + storedToken);
+        return uri;
+    }
+
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await HandleSubmit();
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (string.IsNullOrWhiteSpace(ApiKey))
+        {
+            ErrorMessage = "API key is required";
+            return;
+        }
+
+        await ValidateAndProceed(ApiKey);
+    }
+
+    private async Task ValidateAndProceed(string apiKey)
+    {
+        try
+        {
+            // Here you would typically validate the API key with your backend
+            // For now, we'll just store it and proceed
+            var key = Guid.Parse(apiKey);
+            var token = await Mediator.Send(new GetJwtTokenCommand() { ApiKey = key });
+            await LocalStorage.SetItemAsync("chatApiKey", token);
+            IsVisible = false;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Failed to validate API key";
+            Logger.LogError(ex, "Error happened during api token fetch");
+        }
+    }
+
+    private async Task Send()
+    {
+        var textToSend = TextToSend;
+        if (_hubConnection is null)
+            return;
+        if (IsNewThread)
+        {
+            textToSend = TextToSend;
+            var newThread = new MessageThread
+            {
+                Id = Guid.NewGuid(),
+                ThreadName = NewThreadName,
+                ThreadAuthor = CurrentUserTag
+            };
+            _messages.Add(newThread);
+            CurrentThreadId = newThread.Id;
+            await _hubConnection.SendAsync("SetNewThread", CurrentRoomId, CurrentThreadId, NewThreadName, CurrentUserTag, "");
+            await _hubConnection.SendAsync("SendMessage", CurrentUserTag, textToSend, CurrentRoomId, CurrentThreadId);
+        }
+        else
+        {
+            await _hubConnection.SendAsync("SendMessage", CurrentUserTag, textToSend, CurrentRoomId, CurrentThreadId);
+        }
+    }
+
+}
