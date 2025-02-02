@@ -1,0 +1,30 @@
+﻿using FvckAds.Application.RepositoryInterfaces;
+using FvckAds.Domain.Auth;
+using FvckAds.Domain.Rooms;
+using FvckAds.Domain.Users;
+using FvckAds.Persistence.Repositories;
+using FvckAds.ServiceDefaults;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+namespace FvckAds.Persistence;
+
+public static class DependencyInjection
+{
+    public static IHostApplicationBuilder AddPersistence(this IHostApplicationBuilder builder)
+    {
+        builder.AddNpgsqlDbContext<ChatDbContext>(AspireConstants.PostgresName);
+        
+        builder.Services.AddScoped<IGenericRepository<User>, GenericRepository<User>>();
+        builder.Services.AddScoped<IGenericRepository<Room>, GenericRepository<Room>>();
+        builder.Services.AddScoped<IGenericRepository<RoomUser>, GenericRepository<RoomUser>>();
+        builder.Services.AddScoped<IGenericRepository<Key>, GenericRepository<Key>>();
+        builder.Services.AddScoped<IGenericRepository<AuthKey>, GenericRepository<AuthKey>>();
+        builder.Services.AddScoped<IUsersRepository, UserRepository>();
+        builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+        builder.Services.AddScoped<IAuthKeyRepository, AuthKeyRepository>();
+        
+        return builder;
+    }
+}
