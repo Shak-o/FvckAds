@@ -3,7 +3,7 @@ using FvckAds.Infrastructure.ApiClients;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace FvckAds.Infrastructure;
+namespace FvckAds.Client.Infrastructure;
 
 public static class DependencyInjection
 {

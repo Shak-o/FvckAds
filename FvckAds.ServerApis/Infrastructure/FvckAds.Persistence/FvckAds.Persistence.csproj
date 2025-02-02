@@ -11,6 +11,5 @@
     <ItemGroup>
       <ProjectReference Include="..\..\..\Shared\FvckAds.ServiceDefaults\FvckAds.ServiceDefaults.csproj" />
       <ProjectReference Include="..\..\Core\FvckAds.Application\FvckAds.Application.csproj" />
-      <ProjectReference Include="..\..\Shared\FvckAds.ServiceDefaults\FvckAds.ServiceDefaults.csproj" />
     </ItemGroup>
 </Project>

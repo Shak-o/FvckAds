@@ -16,11 +16,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Infrastructure\FvckAds.MigrationService\FvckAds.MigrationService.csproj" />
-      <ProjectReference Include="..\..\Presentation\FvckAds.SimpleWeb\FvckAds.SimpleWeb.csproj" />
-      <ProjectReference Include="..\..\Presentation\FvckAds.StoreApi\FvckAds.StoreApi.csproj" />
-      <ProjectReference Include="..\..\Presentation\FvckAds.StreamManagerApi\FvckAds.StreamManagerApi.csproj" />
-      <ProjectReference Include="..\..\Presentation\FvckAds.UserManagerApi\FvckAds.UserManagerApi.csproj" />
+      <ProjectReference Include="..\..\FvckAds.Client\Presentation\FvckAds.SimpleWeb\FvckAds.SimpleWeb.csproj" />
+      <ProjectReference Include="..\..\FvckAds.ServerApis\Infrastructure\FvckAds.MigrationService\FvckAds.MigrationService.csproj" />
+      <ProjectReference Include="..\..\FvckAds.ServerApis\Presentation\FvckAds.StreamManagerApi\FvckAds.StreamManagerApi.csproj" />
+      <ProjectReference Include="..\..\FvckAds.ServerApis\Presentation\FvckAds.UserManagerApi\FvckAds.UserManagerApi.csproj" />
+      <ProjectReference Include="..\..\FvckAds.StoreApi\Presentation\FvckAds.StoreApi\FvckAds.StoreApi.csproj" />
     </ItemGroup>
 
 </Project>

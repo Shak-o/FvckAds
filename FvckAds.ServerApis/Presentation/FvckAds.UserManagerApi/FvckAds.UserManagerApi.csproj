@@ -14,7 +14,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Infrastructure\FvckAds.Persistence\FvckAds.Persistence.csproj" />
-      <ProjectReference Include="..\..\Shared\FvckAds.ServiceDefaults\FvckAds.ServiceDefaults.csproj" />
     </ItemGroup>
 
 </Project>
