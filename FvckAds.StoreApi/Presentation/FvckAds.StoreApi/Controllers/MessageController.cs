@@ -1,3 +1,4 @@
+using FvckAds.StoreApi.Domain.Messages;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FvckAds.StoreApi.Controllers;
@@ -6,5 +7,9 @@ namespace FvckAds.StoreApi.Controllers;
 [Route("[controller]")]
 public class MessageController : ControllerBase
 {
+    [HttpPost]
+    public Task StoreMessage(Message message, CancellationToken cancellationToken) => throw new NotImplementedException();
     
+    [HttpGet]
+    public Task<List<Message>> GetMessage(CancellationToken cancellationToken) => throw new NotImplementedException();
 }
