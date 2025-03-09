@@ -7,8 +7,11 @@ var postgres = builder.AddPostgres("Postgres", password: postgresPassword, port:
     .WithLifetime(ContainerLifetime.Persistent)
     .WithDataVolume("PostgresVolume2");
 var postgresDb = postgres.AddDatabase("UserDb");
+var storeDb = postgres.AddDatabase("StoreDb");
 
-builder.AddProject<Projects.FvckAds_StoreApi>("StoreApi", "https");
+builder.AddProject<Projects.FvckAds_StoreApi>("StoreApi", "https")
+    .WithReference(storeDb);
+
 var streamManager = builder.AddProject<Projects.FvckAds_StreamManagerApi>("StreamManager","http")
     .WithReference(redis)
     .WithReference(postgresDb);
